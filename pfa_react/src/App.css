@@ -1,0 +1,110 @@
+body {
+  background: #141E30;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #243B55, #141E30);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #243B55, #141E30); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */}
+  .app{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    text-align: center;
+    
+
+
+
+
+    
+    
+display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+:root {
+  --main-color_back: #00bfff;
+  --main-size-font: 18px;
+  --font1:"Poppins", sans-serif;
+  --font2:"Barriecito";
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4ecdc4;
+  border-radius: 4px;
+}
+
+/* Keyframes for horizontal sliding effect */
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Apply the animation to the text */
+h1 {
+  /*animation: slideInFromLeft 4s ease-out forwards;*/
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* navbar.css */
+
+
+.container {
+  width: 1080px;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Navbar Class */
+.navbar {
+  position: fixed;
+  right: 50px;
+  top: 0;
+  font-family: var(--font1);
+  font-size: var(--main-size-font);
+  left: 50px;
+  width: 1320px;  /* Ensure it spans the entire width of the container */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  z-index: 50; /* Pour être sûr que la navbar reste au-dessus */
+
+}
+
+.navbar h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: var(--font2);
+}
+
+.navbar .nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navbar .nav-links a {
+  color: white;
+
+}
+
+.navbar .nav-links a:hover {
+  background-color: #4ccffb; /* Darker Indigo on hover */
+}
