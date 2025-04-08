@@ -1,5 +1,7 @@
 package com.example.pfa_uplaod.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
@@ -9,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class OpenAIService {
@@ -117,6 +121,97 @@ public class OpenAIService {
         } catch (Exception e) {
             logger.error("Error during OpenAI API call: {}", e.getMessage(), e);
             throw new RuntimeException("Erreur lors de l'appel à l'API OpenAI: " + e.getMessage());
+        }
+    }
+
+    // Ajouter cette méthode dans la classe OpenAIService
+    public Map<String, Object> checkConformity(String text) {
+        logger.info("Starting conformity check");
+        String ragContext = getRAGContext(text);
+        String prompt = "Analyse la conformité RGPD de ce texte et réponds avec :\n"
+                + "[SCORE:] (nombre entre 0-100)\n"
+                + "[CONSENTEMENT:] (OUI/NON)\n"
+                + "[RAISONS:] (liste concise)\n\n"
+                + "Contexte RGPD : \n" + ragContext + "\n\n"
+                + "Texte à analyser :\n" + text;
+
+        Map<String, Object> requestBody = Map.of(
+                "model", "deepseek/deepseek-r1-zero:free",
+                "messages", List.of(Map.of("role", "user", "content", prompt)),
+                "temperature", 0.2
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(OPENAI_API_KEY);
+
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    OPENAI_API_URL,
+                    HttpMethod.POST,
+                    new HttpEntity<>(requestBody, headers),
+                    new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
+
+            return parseOpenAIResponse(response.getBody());
+        } catch (Exception e) {
+            logger.error("Conformity check error: {}", e.getMessage());
+            return Map.of("error", e.getMessage());
+        }
+    }
+
+    private Map<String, Object> parseOpenAIResponse(Map<String, Object> response) {
+        try {
+            // 1. Extraire la liste des choix
+            Object choicesObj = response.get("choices");
+            if (!(choicesObj instanceof List)) {
+                throw new RuntimeException("Format de réponse invalide pour 'choices'");
+            }
+
+            // 2. Cast sécurisé de la liste
+            List<Map<String, Object>> choices = (List<Map<String, Object>>) choicesObj;
+            if (choices.isEmpty()) {
+                throw new RuntimeException("Aucun choix disponible");
+            }
+
+            // 3. Récupérer le premier choix
+            Map<String, Object> firstChoice = choices.get(0);
+            Object messageObj = firstChoice.get("message");
+            if (!(messageObj instanceof Map)) {
+                throw new RuntimeException("Format de message invalide");
+            }
+
+            // 4. Cast du message
+            Map<String, Object> message = (Map<String, Object>) messageObj;
+            Object contentObj = message.get("content");
+            if (!(contentObj instanceof String)) {
+                throw new RuntimeException("Contenu non textuel");
+            }
+
+            String content = (String) contentObj;
+
+            // Extraction des valeurs avec expressions régulières
+            Pattern scorePattern = Pattern.compile("\\[SCORE:\\s*(\\d+)");
+            Pattern consentPattern = Pattern.compile("\\[CONSENTEMENT:\\s*(OUI|NON)");
+            Pattern reasonsPattern = Pattern.compile("\\[RAISONS:\\]([\\s\\S]*?)(?=\\[|$)", Pattern.DOTALL);
+
+            Matcher scoreMatcher = scorePattern.matcher(content);
+            Matcher consentMatcher = consentPattern.matcher(content);
+            Matcher reasonsMatcher = reasonsPattern.matcher(content);
+
+            int score = scoreMatcher.find() ? Integer.parseInt(scoreMatcher.group(1)) : 0;
+            boolean consentement = consentMatcher.find() && consentMatcher.group(1).equalsIgnoreCase("OUI");
+            String raisons = reasonsMatcher.find() ? reasonsMatcher.group(1).trim() : "Non spécifié";
+
+            return Map.of(
+                    "score_conformite", score,
+                    "consentement_valide", consentement,
+                    "raisons", raisons.split("\n")
+            );
+
+        } catch (Exception e) {
+            logger.error("Erreur d'extraction: {}", e.getMessage());
+            return Map.of("error", "Erreur de parsing de la réponse AI");
         }
     }
 }

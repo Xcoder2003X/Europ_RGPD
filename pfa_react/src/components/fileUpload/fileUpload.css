@@ -10,7 +10,7 @@
     padding: 20px;
     background-color: silver;
     border-radius: 8px;
-    box-shadow: 4px 4px 6px 3px rgb(34, 126, 75);
+    box-shadow: 0 5px 6px rgb(66, 102, 158) !important;
     width: 100%;
     max-width: 600px;
     transition: all 0.3s ease;

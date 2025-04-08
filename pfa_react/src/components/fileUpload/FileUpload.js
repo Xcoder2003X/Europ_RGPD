@@ -18,7 +18,7 @@ const useStyles = makeStyles({
         borderRadius: "10px",
         color: "white", // Texte en blanc
         "& *": { color: "white !important" }, // Applique à tous les enfants        
-        boxShadow: "4px 4px 6px 3px rgb(34, 126, 75)!important",
+        boxShadow: "4px 4px 6px 3px #041E42!important",
         backgroundColor: "rgba(43, 42, 43, 0.5) !important", // Fond violet
         
     },
@@ -52,6 +52,34 @@ const useStyles = makeStyles({
         background: "#141E30",  /* fallback for old browsers */
         backgroundImage: "linear-gradient(to right, #243B55, #141E30)", /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */    },
 });
+
+
+// Add this utility component at the top of your file
+const RenderValue = ({ value }) => {
+  if (typeof value === 'object' && value !== null) {
+    return (
+      <ul style={{ margin: 0, paddingLeft: '20px', listStyleType: 'none' }}>
+        {Object.entries(value).map(([subKey, subVal]) => (
+          <li key={subKey}>
+            <strong>{subKey.replace(/_/g, ' ')}:</strong> <RenderValue value={subVal} />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  if (Array.isArray(value)) {
+    return (
+      <ul style={{ margin: 0, paddingLeft: '20px' }}>
+        {value.map((item, index) => (
+          <li key={index}>
+            <RenderValue value={item} />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  return <span>{value?.toString()}</span>;
+};
 
 const FileUpload = () => {
     const classes = useStyles();
@@ -175,6 +203,11 @@ const FileUpload = () => {
                 </button>
             )}
             {/* 🔹 Tableau stylisé avec un scroll */}
+            {analysisData?.error && (
+  <div className="error-message">
+    Error: {analysisData.error}
+  </div>
+)}
             {showTable && analysisData && (
                 <TableContainer component={Paper} className={classes.tableContainer}>
                     <Table className={classes.table}>
@@ -184,14 +217,18 @@ const FileUpload = () => {
                                 <TableCell className={classes.tableHeadCell}>Valeur</TableCell>
                             </TableRow>
                         </TableHead>
-                        <TableBody>
-                            {Object.entries(analysisData).map(([key, value]) => (
-                                <TableRow key={key} className={classes.tableRow}>
-                                    <TableCell className={classes.tableCell}>{key}</TableCell>
-                                    <TableCell className={classes.tableCell}>{value}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
+                      <TableBody>
+  {Object.entries(analysisData).map(([key, value]) => (
+    <TableRow key={key} className={classes.tableRow}>
+      <TableCell className={classes.tableCell}>
+        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+      </TableCell>
+      <TableCell className={classes.tableCell}>
+        <RenderValue value={value} />
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
                     </Table>
                 </TableContainer>
             )}

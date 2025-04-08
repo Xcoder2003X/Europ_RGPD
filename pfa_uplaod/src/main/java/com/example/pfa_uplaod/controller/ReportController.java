@@ -44,22 +44,18 @@ public class ReportController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Aucun fichier sélectionné !"));
             }
 
-            // Analyze the file structure and content
             Map<String, Object> analysisResult = fileAnalysisService.analyzeFile(file);
-            logger.info("File analysis completed");
-
-            // Extract text for RAG analysis
             String fileText = extractTextFromFile(file);
-            logger.info("Text extraction completed, length: {}", fileText.length());
 
-            // Get AI analysis with RAG context
-            String aiAnalysis = openAIService.analyzeDocument(fileText);
-            logger.info("AI analysis completed");
+            // Ajout de l'analyse de conformité RGPD
+            Map<String, Object> conformityResult = openAIService.checkConformity(fileText);
+            analysisResult.put("rgpd_analysis", conformityResult);
 
-            // Add AI analysis to the results
-            analysisResult.put("analyse_openai", aiAnalysis);
+            // Analyse OpenAI détaillée
+           // String aiAnalysis = openAIService.analyzeDocument(fileText);
+            //analysisResult.put("analyse_openai", aiAnalysis);
 
-            // Save analysis results
+            // Sauvegarde des résultats
             FileMetaData metadata = new FileMetaData();
             metadata.setFileName(file.getOriginalFilename());
             metadata.setFileType(determineFileType(file));
