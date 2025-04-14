@@ -9,10 +9,10 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class OpenAIService {
@@ -131,7 +131,7 @@ public class OpenAIService {
         String prompt = "Analyse la conformité RGPD de ce texte et réponds avec :\n"
                 + "[SCORE:] (nombre entre 0-100)\n"
                 + "[CONSENTEMENT:] (OUI/NON)\n"
-                + "[RAISONS:] (liste concise)\n\n"
+                + "[RAISONS:] (liste concise use the negation non with non conformity raisons the other wich are conform dont use non)\n\n"
                 + "Contexte RGPD : \n" + ragContext + "\n\n"
                 + "Texte à analyser :\n" + text;
 
@@ -201,14 +201,33 @@ public class OpenAIService {
 
             int score = scoreMatcher.find() ? Integer.parseInt(scoreMatcher.group(1)) : 0;
             boolean consentement = consentMatcher.find() && consentMatcher.group(1).equalsIgnoreCase("OUI");
+
             String raisons = reasonsMatcher.find() ? reasonsMatcher.group(1).trim() : "Non spécifié";
+
+            // Séparation des points de conformité et non-conformité
+            List<String> allReasons = Arrays.stream(raisons.split("\n"))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+
+            Map<String, List<String>> categorizedReasons = new HashMap<>();
+            categorizedReasons.put("conform", new ArrayList<>());
+            categorizedReasons.put("nonConform", new ArrayList<>());
+
+            for (String reason : allReasons) {
+                if (reason.toLowerCase().contains("non")) {
+                    categorizedReasons.get("nonConform").add(reason);
+                } else {
+                    categorizedReasons.get("conform").add(reason);
+                }
+            }
 
             return Map.of(
                     "score_conformite", score,
                     "consentement_valide", consentement,
-                    "raisons", raisons.split("\n")
+                    "points_conformite", categorizedReasons.get("conform"),
+                    "points_non_conformite", categorizedReasons.get("nonConform")
             );
-
         } catch (Exception e) {
             logger.error("Erreur d'extraction: {}", e.getMessage());
             return Map.of("error", "Erreur de parsing de la réponse AI");

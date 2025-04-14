@@ -56,6 +56,9 @@ const useStyles = makeStyles({
 
 // Add this utility component at the top of your file
 const RenderValue = ({ value }) => {
+
+  
+
   if (typeof value === 'object' && value !== null) {
     return (
       <ul style={{ margin: 0, paddingLeft: '20px', listStyleType: 'none' }}>
@@ -81,6 +84,8 @@ const RenderValue = ({ value }) => {
   return <span>{value?.toString()}</span>;
 };
 
+
+
 const FileUpload = () => {
     const classes = useStyles();
     const [file, setFile] = useState(null);
@@ -89,6 +94,11 @@ const FileUpload = () => {
     const [showTable, setShowTable] = useState(false); // État pour afficher/masquer le tableau
     const [reportUrl, setReportUrl] = useState("");
     const [open, setOpen] = useState(false);
+    // Add new state variables
+
+  const [conformityDialogOpen, setConformityDialogOpen] = useState(false);
+  const [conformityPoints, setConformityPoints] = useState([]);
+  const [nonConformityPoints, setNonConformityPoints] = useState([]);
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
     };
@@ -107,12 +117,15 @@ const FileUpload = () => {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
-            const { consentement_valide } = response.data; //Récupération de hasConsent
-
-      if (!consentement_valide) {
-        alert("⚠️ Attention ! Ce document ne contient pas de consentement valide !");
-      } 
-      else            setMessage("✅ Analyse terminée avec succès.");
+            const { rgpd_analysis } = response.data;
+            
+            
+            if (rgpd_analysis) {
+              setConformityPoints(rgpd_analysis.points_conformite || []);
+              setNonConformityPoints(rgpd_analysis.points_non_conformite || []);
+              setConformityDialogOpen(true);
+          }
+      
 
 
             setAnalysisData(response.data);
@@ -156,6 +169,148 @@ const FileUpload = () => {
         }
     };
 
+    const ConformityDialog = () => (
+      <Dialog 
+          open={conformityDialogOpen} 
+          onClose={() => setConformityDialogOpen(false)}
+          maxWidth="md"
+          color= 'white'
+          fullWidth
+
+      >
+          <DialogTitle style={{ 
+              background: '#2d2d2d', 
+              color: 'white',
+              borderBottom: '2px solid #444'
+          }}>
+              Analyse de conformité RGPD
+          </DialogTitle>
+          
+          <DialogContent style={{ 
+              background: '#1a1a1a', 
+              padding: '20px',
+              minHeight: '400px',
+              color:"white"
+          }}>
+              {/* Section Non-conformité */}
+              {nonConformityPoints.length > 0 && (
+                  <div style={{ marginBottom: '30px' }}>
+                      <h3 style={{ 
+                          color: '#ff4444', 
+                          marginBottom: '15px',
+                          display: 'flex',
+                          alignItems: 'center'
+                      }}>
+                          <span style={{ 
+                              background: '#ff4444', 
+                              width: '10px',
+                              height: '10px',
+                              borderRadius: '50%',
+                              marginRight: '10px'
+                          }}></span>
+                          Points de non-conformité ({nonConformityPoints.length})
+                      </h3>
+                      <ul style={{ 
+                          listStyle: 'none', 
+                          padding: 0,
+                          margin: 0,
+                          borderLeft: '3px solid #ff4444',
+                          paddingLeft: '15px'
+                      }}>
+                          {nonConformityPoints.map((point, index) => (
+                              <li 
+                                  key={`non-conform-${index}`}
+                                  style={{ 
+                                      background: 'rgba(255, 68, 68, 0.1)',
+                                      padding: '12px',
+                                      margin: '8px 0',
+                                      borderRadius: '6px',
+                                      display: 'flex',
+                                      alignItems: 'baseline'
+                                  }}
+                              >
+                                  <span style={{ 
+                                      color: '#ff4444', 
+                                      marginRight: '10px',
+                                      fontWeight: 'bold'
+                                  }}>✖</span>
+                                  {point}
+                              </li>
+                          ))}
+                      </ul>
+                  </div>
+              )}
+
+              {/* Section Conformité */}
+              {conformityPoints.length > 0 && (
+                  <div>
+                      <h3 style={{ 
+                          color: '#00C851', 
+                          marginBottom: '15px',
+                          display: 'flex',
+                          alignItems: 'center'
+                      }}>
+                          <span style={{ 
+                              background: '#00C851', 
+                              width: '10px',
+                              height: '10px',
+                              borderRadius: '50%',
+                              marginRight: '10px'
+                          }}></span>
+                          Points conformes ({conformityPoints.length})
+                      </h3>
+                      <ul style={{ 
+                          listStyle: 'none', 
+                          padding: 0,
+                          margin: 0,
+                          borderLeft: '3px solid #00C851',
+                          paddingLeft: '15px'
+                      }}>
+                          {conformityPoints.map((point, index) => (
+                              <li 
+                                  key={`conform-${index}`}
+                                  style={{ 
+                                      background: 'rgba(0, 200, 81, 0.1)',
+                                      padding: '12px',
+                                      margin: '8px 0',
+                                      borderRadius: '6px',
+                                      display: 'flex',
+                                      alignItems: 'baseline'
+                                  }}
+                              >
+                                  <span style={{ 
+                                      color: '#00C851', 
+                                      marginRight: '10px',
+                                      fontWeight: 'bold'
+                                  }}>✔</span>
+                                  {point}
+                              </li>
+                          ))}
+                      </ul>
+                  </div>
+              )}
+          </DialogContent>
+
+          <DialogActions style={{ 
+              background: '#2d2d2d', 
+              padding: '15px 20px',
+              borderTop: '2px solid #444'
+          }}>
+              <Button 
+                  onClick={() => setConformityDialogOpen(false)}
+                  style={{ 
+                      color: '#fff',
+                      background: '#555',
+                      '&:hover': { background: '#666' }
+                  }}
+              >
+                  Fermer
+              </Button>
+          </DialogActions>
+      </Dialog>
+  );     
+
+
     return (
         <div className="file-upload-container">
             <h2 className="upload-title">Upload de fichiers</h2>
@@ -174,7 +329,18 @@ const FileUpload = () => {
                     Générer le Rapport
                 </button>
             </div>
-
+            <ConformityDialog />
+            {analysisData?.rgpd_analysis && (
+                <p style={{ 
+                    color: analysisData.rgpd_analysis.consentement_valide ? 'green' : 'red',
+                    fontWeight: 'bold',
+                    margin: '10px 0'
+                }}>
+                    {analysisData.rgpd_analysis.consentement_valide 
+                        ? '✅ Consentement valide' 
+                        : '⛔ Consentement non valide'}
+                </p>
+            )}
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>Rapport Généré</DialogTitle>
                 <DialogContent>
@@ -234,6 +400,7 @@ const FileUpload = () => {
             )}
         </div>
     );
+
 };
 
 export default FileUpload;
