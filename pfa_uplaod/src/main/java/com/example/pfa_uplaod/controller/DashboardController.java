@@ -58,20 +58,22 @@ public class DashboardController {
 
                         // Scores de conformité paginés
                         List<Map<String, Object>> conformityScores = analysisPage.getContent()
-                                        .stream()
-                                        .map(analysis -> {
-                                                Map<String, Object> map = new HashMap<>();
-                                                map.put("name", getFileName(analysis));
-                                                map.put("type", analysis.getMetadata().getFileType() != null
-                                                                ? analysis.getMetadata().getFileType()
-                                                                : "INCONNU");
-                                                map.put("score", analysis.getConformityScore() != null
-                                                                ? analysis.getConformityScore()
-                                                                : 0.0);
-                                                return map;
-                                        })
-                                        .collect(Collectors.toList());
+                                .stream()
+                                .map(analysis -> {
+                                        Map<String, Object> map = new HashMap<>();
+                                        map.put("name", getFileName(analysis));
+                                        map.put("type", analysis.getMetadata().getFileType() != null
+                                                ? analysis.getMetadata().getFileType()
+                                                : "INCONNU");
+                                        // ✅ Use LLM score instead of calculated score
+                                        map.put("score", analysis.getLlmConformityScore() != null
+                                                ? analysis.getLlmConformityScore().doubleValue() // Convertit Integer → Double
+                                                : 0.0);
+                                        return map;
+                                })
+                                .collect(Collectors.toList());
                         dashboardData.put("conformityScores", conformityScores);
+
 
                         // Fichiers récents
                         List<Map<String, Object>> recentFiles = metadataRepository.findTop5ByOrderByUploadDateDesc()
@@ -110,7 +112,7 @@ public class DashboardController {
 
         private Double getLatestScoreForFile(FileMetaData metadata) {
                 return analysisRepository.findTopByMetadataOrderByAnalysisDateDesc(metadata)
-                                .map(fa -> fa.getConformityScore() != null ? fa.getConformityScore() : 0.0)
-                                .orElse(0.0);
+                        .map(fa -> fa.getLlmConformityScore() != null ? fa.getLlmConformityScore() : 0.0) // ✅ Use LLM score
+                        .orElse(0.0);
         }
 }

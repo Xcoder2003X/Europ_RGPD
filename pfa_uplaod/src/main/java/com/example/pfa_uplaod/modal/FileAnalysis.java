@@ -108,6 +108,20 @@ public class FileAnalysis {
     public Double getConformityScore() {
 return conformityScore;    }
 
+    // ✅ Correct LLM score definition
+    @Column(name = "llm_conformity_score", nullable = false)
+    private Integer llmConformityScore = 0;
+
+    // Getters/setters
+    public Integer getLlmConformityScore() {
+        return llmConformityScore;
+    }
+
+    public void setLlmConformityScore(Integer llmConformityScore) {
+        this.llmConformityScore = llmConformityScore != null ? llmConformityScore : 0;
+    }
+
+
 
     // ... autres getters/setters
 }

@@ -82,7 +82,7 @@ const Dashboard = () => {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data?.conformityScores ?? []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#ffffff55" />
-              <XAxis dataKey="file" stroke="#fff" />
+              <XAxis dataKey="name" stroke="#fff" />
               <YAxis stroke="#fff" />
               <Tooltip contentStyle={{ backgroundColor: "#333", color: "#fff" }} />
               <Legend wrapperStyle={{ color: "#fff" }} />
@@ -124,7 +124,7 @@ const Dashboard = () => {
                   <td className="p-2 border border-gray-700">{file.name}</td>
                   <td className="p-2 border border-gray-700">{file.type}</td>
                   <td className={`p-2 border border-gray-700 ${file.score >= 70 ? "text-green-400" : "text-red-400"}`}>
-                    {file.score}%
+                    {file.score.toFixed(1)}%
                   </td>
                 </tr>
               ))}
@@ -132,17 +132,19 @@ const Dashboard = () => {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
       <div className="flex justify-center mt-4">
-                {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => handlePageChange(i)}
-                        className={`mx-1 px-3 py-1 rounded ${i === page ? 'bg-blue-500' : 'bg-gray-700'}`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
-            </div>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => handlePageChange(i)}
+            className={`mx-1 px-3 py-1 rounded ${i === page ? 'bg-blue-500' : 'bg-gray-700'}`}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

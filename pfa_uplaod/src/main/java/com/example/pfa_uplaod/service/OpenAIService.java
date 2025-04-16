@@ -17,21 +17,22 @@ import java.util.stream.Collectors;
 @Service
 public class OpenAIService {
 
-    private static final String OPENAI_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    private static final String OPENAI_API_KEY = "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"; // 🔴
-                                                                                                                              // Remplace
-                                                                                                                              // par
-                                                                                                                              // ta
-                                                                                                                              // clé
-                                                                                                                              // API
-    private static final String RAG_SERVICE_URL = "http://localhost:5000/query";
-    private final RestTemplate restTemplate;
     private static final Logger logger = LoggerFactory.getLogger(OpenAIService.class);
+
+    private static final String OPENAI_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+    // Note: Securely externalize your API key in production
+    private static final String OPENAI_API_KEY = "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";
+    private static final String RAG_SERVICE_URL = "http://localhost:5000/query";
+
+    private final RestTemplate restTemplate;
 
     public OpenAIService() {
         this.restTemplate = new RestTemplate();
     }
 
+    /**
+     * Get relevant context from RAG service.
+     */
     private String getRAGContext(String question) {
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -44,42 +45,42 @@ public class OpenAIService {
                     RAG_SERVICE_URL,
                     HttpMethod.POST,
                     request,
-                    new ParameterizedTypeReference<Map<String, Object>>() {
-                    });
+                    new ParameterizedTypeReference<Map<String, Object>>() { }
+            );
 
             Map<String, Object> responseBody = response.getBody();
             if (responseBody != null && responseBody.containsKey("answer")) {
                 return (String) responseBody.get("answer");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error retrieving RAG context: {}", e.getMessage(), e);
         }
         return "";
     }
 
+    /**
+     * Analyze the document for a detailed report.
+     */
     public String analyzeDocument(String text) {
         logger.info("Starting document analysis");
 
-        // Get relevant context from RAG
         String ragContext = getRAGContext(text);
         logger.info("Retrieved RAG context, length: {}", ragContext.length());
 
-        String prompt = "Analyse ce texte et donne-moi un rapport détaillé sur : \n"
-                + "- Qualité des données : Données manquantes, incohérentes ou non pertinentes.\n"
-                + "- Diversité et représentativité : Statistiques sur les différentes catégories.\n"
-                // + "- Détection des biais : Biais implicites ou distributions
-                // déséquilibrées.\n"
-                // + "- Transparence et traçabilité : Vérification de l'origine des
-                // données.\n\n"
-                + "est ce que le text a analyser est conforme aux regles du RGPD ? si non citer les points de non conformite et donner des recommandations pour la conformite totale"
-                + "Contexte RGPD pertinent : \n" + ragContext + "\n\n"
-                + "Voici le texte à analyser : \n" + text;
+        String prompt = "Analyse ce texte et donne-moi un rapport détaillé sur : \n" +
+                "- Qualité des données : Données manquantes, incohérentes ou non pertinentes.\n" +
+                "- Diversité et représentativité : Statistiques sur les différentes catégories.\n" +
+                "Est-ce que le texte à analyser est conforme aux règles du RGPD ? " +
+                "Si non, citer les points de non-conformité et donner des recommandations pour la conformité totale.\n" +
+                "Contexte RGPD pertinent : \n" + ragContext + "\n\n" +
+                "Voici le texte à analyser : \n" + text;
 
         logger.info("Sending request to OpenAI API");
         Map<String, Object> requestBody = Map.of(
                 "model", "deepseek/deepseek-r1-zero:free",
                 "messages", List.of(Map.of("role", "user", "content", prompt)),
-                "temperature", 0.7);
+                "temperature", 0.7
+        );
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -92,8 +93,8 @@ public class OpenAIService {
                     OPENAI_API_URL,
                     HttpMethod.POST,
                     request,
-                    new ParameterizedTypeReference<Map<String, Object>>() {
-                    });
+                    new ParameterizedTypeReference<Map<String, Object>>() { }
+            );
 
             Map<String, Object> responseBody = response.getBody();
             if (responseBody == null) {
@@ -114,6 +115,7 @@ public class OpenAIService {
                 throw new RuntimeException("Pas de choix dans la réponse de l'API OpenAI");
             }
 
+            @SuppressWarnings("unchecked")
             Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
             String analysis = (String) message.get("content");
             logger.info("Successfully received analysis from OpenAI API");
@@ -124,16 +126,18 @@ public class OpenAIService {
         }
     }
 
-    // Ajouter cette méthode dans la classe OpenAIService
+    /**
+     * Check the RGPD conformity using a dedicated prompt.
+     */
     public Map<String, Object> checkConformity(String text) {
         logger.info("Starting conformity check");
         String ragContext = getRAGContext(text);
-        String prompt = "Analyse la conformité RGPD de ce texte et réponds avec :\n"
-                + "[SCORE:] (nombre entre 0-100)\n"
-                + "[CONSENTEMENT:] (OUI/NON)\n"
-                + "[RAISONS:] (liste concise use the negation non with non conformity raisons the other wich are conform dont use non)\n\n"
-                + "Contexte RGPD : \n" + ragContext + "\n\n"
-                + "Texte à analyser :\n" + text;
+        String prompt = "Analyse la conformité RGPD de ce texte et réponds avec :\n" +
+                "[SCORE:] (nombre entre 0-100)\n" +
+                "[CONSENTEMENT:] (OUI/NON)\n" +
+                "[RAISONS:] (liste concise des raisons, en indiquant 'non' pour les points non conformes et pas de 'non' pour les points conformes)\n\n" +
+                "Contexte RGPD : \n" + ragContext + "\n\n" +
+                "Texte à analyser :\n" + text;
 
         Map<String, Object> requestBody = Map.of(
                 "model", "deepseek/deepseek-r1-zero:free",
@@ -160,28 +164,30 @@ public class OpenAIService {
         }
     }
 
+    /**
+     * Parses the OpenAI API response and extracts the conformity score and reasons.
+     */
     private Map<String, Object> parseOpenAIResponse(Map<String, Object> response) {
         try {
-            // 1. Extraire la liste des choix
             Object choicesObj = response.get("choices");
             if (!(choicesObj instanceof List)) {
                 throw new RuntimeException("Format de réponse invalide pour 'choices'");
             }
 
-            // 2. Cast sécurisé de la liste
+            @SuppressWarnings("unchecked")
             List<Map<String, Object>> choices = (List<Map<String, Object>>) choicesObj;
             if (choices.isEmpty()) {
                 throw new RuntimeException("Aucun choix disponible");
             }
 
-            // 3. Récupérer le premier choix
+            @SuppressWarnings("unchecked")
             Map<String, Object> firstChoice = choices.get(0);
             Object messageObj = firstChoice.get("message");
             if (!(messageObj instanceof Map)) {
                 throw new RuntimeException("Format de message invalide");
             }
 
-            // 4. Cast du message
+            @SuppressWarnings("unchecked")
             Map<String, Object> message = (Map<String, Object>) messageObj;
             Object contentObj = message.get("content");
             if (!(contentObj instanceof String)) {
@@ -190,10 +196,10 @@ public class OpenAIService {
 
             String content = (String) contentObj;
 
-            // Extraction des valeurs avec expressions régulières
-            Pattern scorePattern = Pattern.compile("\\[SCORE:\\s*(\\d+)");
-            Pattern consentPattern = Pattern.compile("\\[CONSENTEMENT:\\s*(OUI|NON)");
-            Pattern reasonsPattern = Pattern.compile("\\[RAISONS:\\]([\\s\\S]*?)(?=\\[|$)", Pattern.DOTALL);
+            // Extraction using regular expressions
+            Pattern scorePattern = Pattern.compile("\\[SCORE:?\\s*(\\d+)"); // Accepte "SCORE:" ou "SCORE"
+            Pattern consentPattern = Pattern.compile("\\[CONSENTEMENT:\\s*(OUI|NON)", Pattern.CASE_INSENSITIVE);
+            Pattern reasonsPattern = Pattern.compile("\\[RAISONS:\\]([\\s\\S]*?)(?=\\[|$)");
 
             Matcher scoreMatcher = scorePattern.matcher(content);
             Matcher consentMatcher = consentPattern.matcher(content);
@@ -204,7 +210,7 @@ public class OpenAIService {
 
             String raisons = reasonsMatcher.find() ? reasonsMatcher.group(1).trim() : "Non spécifié";
 
-            // Séparation des points de conformité et non-conformité
+            // Separate conformity points into two categories
             List<String> allReasons = Arrays.stream(raisons.split("\n"))
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())

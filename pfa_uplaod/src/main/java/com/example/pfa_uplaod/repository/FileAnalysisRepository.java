@@ -23,4 +23,7 @@ public interface FileAnalysisRepository extends JpaRepository<FileAnalysis, Long
     Page<FileAnalysis> findAllWithPagination(Pageable pageable);
 
     Optional<FileAnalysis> findTopByMetadataOrderByAnalysisDateDesc(FileMetaData metadata);
+
+    @Query("SELECT AVG(f.llmConformityScore) FROM FileAnalysis f")
+    Double getAvgLlmConformityScore();
 }
