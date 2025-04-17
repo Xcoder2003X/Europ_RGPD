@@ -101,7 +101,7 @@ const ParallaxBackground = styled('div')({
   left: 0,
   width: '100%',
   height: '200%',
-  background: 'linear-gradient(120deg, #1a2a6c, #b21f1f, #fdbb2d)',
+  background: 'linear-gradient(120deg, #1a2a6c 0%, #1f81b2 70%, #99c8f1 85%)',
   backgroundSize: 'cover',
   animation: 'moveBackground 30s linear infinite',
   zIndex: -1,

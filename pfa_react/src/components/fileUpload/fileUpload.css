@@ -8,13 +8,18 @@
     justify-content: center;
     margin-top: 50px;
     padding: 20px;
-    background-color: silver;
+    background-color: transparent;
     border-radius: 8px;
-    box-shadow: 0 5px 6px rgb(66, 102, 158) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     width: 100%;
     max-width: 600px;
     transition: all 0.3s ease;
     animation: uploadAppear 1s ease-out ;
+    padding: 40px 30px ;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 
   }
   
