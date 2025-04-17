@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  spring-backend:
+    build: ./pfa_uplaod
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - ai-conform-net
+
+  react-frontend:
+    build: ./pfa_react
+    ports:
+      - "3000:80"
+    depends_on:
+      - spring-backend
+    networks:
+      - ai-conform-net
+
+  rag-service:
+    build: ./rag_python
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+    volumes:
+      - ./rag_python/data:/app/data
+    networks:
+      - ai-conform-net
+    # For GPU support:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+networks:
+  ai-conform-net:
+    driver: bridge

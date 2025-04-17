@@ -58,7 +58,7 @@
 .button-analyse,.button-rapport {
   --green: #040505;
   font-size: 15px;
-  padding: 0.7em 2.7em;
+  padding: 0.5em 1.9em;
   letter-spacing: 0.06em;
   cursor: pointer;
   position: relative;

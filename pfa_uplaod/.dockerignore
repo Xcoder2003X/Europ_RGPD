@@ -1,0 +1,21 @@
+# Java specific
+target/
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Build files
+.mvn/
+mvnw
+mvnw.cmd
+
+# Logs
+*.log
+
+# Environment files
+.env

@@ -13,7 +13,8 @@ function App() {
       <div className="app">
         {/* Custom Styled Navbar */}
         <nav className="navbar">
-          <h1>🤖 AI Conform🤖</h1>
+        <h1 class="logo"></h1>
+
           <div className="nav-links">
             <Link className="button-analyse" to="/">Signup</Link>
             <Link className="button-analyse" to="/login">Login</Link>
