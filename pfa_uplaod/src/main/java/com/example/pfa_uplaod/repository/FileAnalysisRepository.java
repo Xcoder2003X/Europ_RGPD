@@ -19,8 +19,14 @@ public interface FileAnalysisRepository extends JpaRepository<FileAnalysis, Long
             "WHERE metadata.columns IS NOT NULL") // <-- Filtre les NULL
     Map<String, Object> getGlobalMissingStats();
 
-    @Query("SELECT a FROM FileAnalysis a ORDER BY a.analysisDate DESC")
+
+
+    @Query(
+            value = "SELECT a FROM FileAnalysis a JOIN FETCH a.metadata m JOIN FETCH m.uploadedBy",
+            countQuery = "SELECT COUNT(a) FROM FileAnalysis a" // ← Required for pagination
+    )
     Page<FileAnalysis> findAllWithPagination(Pageable pageable);
+
 
     Optional<FileAnalysis> findTopByMetadataOrderByAnalysisDateDesc(FileMetaData metadata);
 

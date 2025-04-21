@@ -1,36 +1,32 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/auth/';  // Mets à jour cette URL selon ton serveur Spring Boot
+const API_URL = 'http://localhost:8080/api/auth/';
 
 const register = (username, password, role) => {
   return axios.post(API_URL + 'signup', { username, password, role });
 };
 
 const login = async (username, password) => {
-  try {
-    const response = await axios.post("http://localhost:8080/api/auth/signin", {
-      username,
-      password,
-    });
-    
-    if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data));
-    }
-    
-    return response.data;
-  } catch (error) {
-    throw error;
+  // call the Spring /signin endpoint
+  const response = await axios.post(API_URL + 'signin', { username, password });
+
+  // if we got a token back, stash it
+  if (response.data.token) {
+    localStorage.setItem('token', response.data.token);
+    localStorage.setItem('user', JSON.stringify(response.data)); 
   }
+
+  // this is the crucial bit—you must return the payload
+  return response.data;
 };
 
 const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
 };
 
 const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem("user"));
+  return JSON.parse(localStorage.getItem('user'));
 };
 
 export default {
@@ -39,3 +35,4 @@ export default {
   logout,
   getCurrentUser
 };
+

@@ -50,7 +50,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 w-full bg-black pt-[150px] min-h-screen text-white ">
+    <div className="p-6 w-full  pt-[150px] min-h-screen text-white ">
       <h1 className="text-2xl font-bold mb-6">📊 Dashboard de conformité</h1>
 
       {/* Cartes des indicateurs clés */}
@@ -114,7 +114,7 @@ const Dashboard = () => {
             <thead>
               <tr className="bg-gray-800">
                 <th className="p-2 border border-gray-700">Fichier</th>
-                <th className="p-2 border border-gray-700">Format</th>
+                <th className="p-2 border border-gray-700">Organisation</th>
                 <th className="p-2 border border-gray-700">Conformité</th>
               </tr>
             </thead>
@@ -122,7 +122,7 @@ const Dashboard = () => {
               {data?.conformityScores?.map((file, index) => (
                 <tr key={index} className="text-center">
                   <td className="p-2 border border-gray-700">{file.name}</td>
-                  <td className="p-2 border border-gray-700">{file.type}</td>
+                  <td className="p-2 border border-gray-700">{file.droppedBy}</td>
                   <td className={`p-2 border border-gray-700 ${file.score >= 70 ? "text-green-400" : "text-red-400"}`}>
                     {file.score.toFixed(1)}%
                   </td>

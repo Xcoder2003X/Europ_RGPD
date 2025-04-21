@@ -4,7 +4,9 @@ import com.example.pfa_uplaod.Dto.AuthRequest;
 import com.example.pfa_uplaod.Dto.AuthResponse;
 import com.example.pfa_uplaod.modal.UserEntity;
 import com.example.pfa_uplaod.repository.UserRepository;
+import com.example.pfa_uplaod.service.AuthService;
 import com.example.pfa_uplaod.service.JwtService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,41 +20,26 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
+    private final AuthService authService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
 
+    @Autowired
     public AuthController(
+            AuthService authService,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            AuthenticationManager authenticationManager,
-            JwtService jwtService,
-            UserDetailsService userDetailsService) {
+            PasswordEncoder passwordEncoder
+    ) {
+        this.authService = authService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
     }
 
     @PostMapping("/signin")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-
-            UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-            String token = jwtService.generateToken(userDetails);
-            // Récupérer le rôle de l'utilisateur (ici on prend le premier rôle trouvé)
-            String role = userDetails.getAuthorities().stream()
-                    .findFirst()
-                    .map(GrantedAuthority::getAuthority)
-                    .orElse("ROLE_USER");
-
-            return ResponseEntity.ok(new AuthResponse(token,role));
+            AuthResponse authResponse = authService.authenticateUser(authRequest);
+            return ResponseEntity.ok(authResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }

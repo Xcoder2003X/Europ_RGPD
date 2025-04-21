@@ -13,7 +13,7 @@ public class FileAnalysis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "metadata_id")
     private FileMetaData metadata;
 

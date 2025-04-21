@@ -1,87 +1,101 @@
 package com.example.pfa_uplaod.controller;
 
 import com.example.pfa_uplaod.modal.FileMetaData;
+import com.example.pfa_uplaod.modal.UserEntity;
+import com.example.pfa_uplaod.repository.UserRepository;
 import com.example.pfa_uplaod.service.AnalysisService;
 import com.example.pfa_uplaod.service.FileAnalysisService;
 import com.example.pfa_uplaod.service.OpenAIService;
-import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.sax.BodyContentHandler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reports")
 public class ReportController {
-
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
 
     private final FileAnalysisService fileAnalysisService;
     private final AnalysisService analysisService;
     private final OpenAIService openAIService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ReportController(FileAnalysisService fileAnalysisService,
-                            AnalysisService analysisService,
-                            OpenAIService openAIService) {
+    public ReportController(
+            FileAnalysisService fileAnalysisService,
+            AnalysisService analysisService,
+            OpenAIService openAIService,
+            UserRepository userRepository
+    ) {
         this.fileAnalysisService = fileAnalysisService;
         this.analysisService = analysisService;
         this.openAIService = openAIService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/analyze")
-    public ResponseEntity<?> analyzeFile(@RequestPart("file") MultipartFile file) {
+    public ResponseEntity<?> analyzeFile(
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         try {
-            logger.info("Starting file analysis for: {}", file.getOriginalFilename());
+            // 1. Get authenticated user
+            String username = userDetails.getUsername();
+            UserEntity user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
+
+            // 2. Validate file
+            logger.info("Starting file analysis for: {}", file.getOriginalFilename());
             if (file.isEmpty()) {
-                logger.warn("Empty file received");
                 return ResponseEntity.badRequest().body(Map.of("error", "Aucun fichier sélectionné !"));
             }
 
-            // Analyze file to extract metrics (e.g., rows, missing values etc.)
+            // 3. Analyze file
             Map<String, Object> analysisResult = fileAnalysisService.analyzeFile(file);
-
-            // Extract full text from the file for further analysis
             String fileText = extractTextFromFile(file);
 
-            // Perform RGPD conformity check using OpenAIService
+            // 4. Perform RGPD analysis
             Map<String, Object> conformityResult = openAIService.checkConformity(fileText);
             analysisResult.put("rgpd_analysis", conformityResult);
 
-            // Optionally, call detailed AI analysis (currently commented out)
-            // String aiAnalysis = openAIService.analyzeDocument(fileText);
-            // analysisResult.put("analyse_openai", aiAnalysis);
-
-            // Prepare FileMetaData entity
+            // 5. Save metadata
             FileMetaData metadata = new FileMetaData();
             metadata.setFileName(file.getOriginalFilename());
             metadata.setFileType(determineFileType(file));
             metadata.setFileSize(file.getSize());
             metadata.setUploadDate(LocalDateTime.now());
-
-            // Persist analysis results along with file metadata
+            metadata.setUploadedBy(user);
+            metadata.setOrganisation_name(username);
             analysisService.saveAnalysisResults(metadata, analysisResult);
 
+            // 6. Return response (no authResponse needed)
             return ResponseEntity.ok(analysisResult);
 
         } catch (Exception e) {
             logger.error("Error analyzing file: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError()
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Erreur lors de l'analyse du fichier: " + e.getMessage()));
         }
     }
-
     /**
      * Determine file type based on extension or content type.
      */

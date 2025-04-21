@@ -2,9 +2,13 @@ package com.example.pfa_uplaod.service;
 
 import com.example.pfa_uplaod.modal.FileAnalysis;
 import com.example.pfa_uplaod.modal.FileMetaData;
+import com.example.pfa_uplaod.modal.UserEntity;
 import com.example.pfa_uplaod.repository.FileAnalysisRepository;
 import com.example.pfa_uplaod.repository.FileMetadataRepository;
+import com.example.pfa_uplaod.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
@@ -19,28 +23,32 @@ public class AnalysisService {
 
     private final FileMetadataRepository metadataRepo;
     private final FileAnalysisRepository analysisRepo;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AnalysisService(FileMetadataRepository metadataRepo, FileAnalysisRepository analysisRepo) {
+    public AnalysisService(FileMetadataRepository metadataRepo,
+                           FileAnalysisRepository analysisRepo,
+                           UserRepository userRepository) {
         this.metadataRepo = metadataRepo;
         this.analysisRepo = analysisRepo;
+        this.userRepository = userRepository;
     }
 
     public void saveAnalysisResults(FileMetaData metadata, Map<String, Object> analysisResult) {
         FileAnalysis analysis = new FileAnalysis();
 
         try {
-            validateAnalysisData(analysisResult); // Updated validation
 
-            // Metadata handling (unchanged)
+
+            // 2) Lier et persister le metadata
+
             Integer columns = safeConvertToInteger(analysisResult.get("columns"));
             metadata.setColumns(columns != null ? columns : 0);
-            metadataRepo.save(metadata);
+            FileMetaData savedMeta = metadataRepo.save(metadata);
 
-            // ✅ Improved LLM score extraction
+            // 3) Extraction du score LLM
             Map<String, Object> rgpdAnalysis = (Map<String, Object>) analysisResult.get("rgpd_analysis");
             Integer llmScore = 0;
-
             if (rgpdAnalysis != null) {
                 Object scoreObj = rgpdAnalysis.get("score_conformite");
                 if (scoreObj instanceof Number) {
@@ -53,36 +61,25 @@ public class AnalysisService {
                     }
                 }
             }
-
-            // ✅ Set LLM score explicitly
             analysis.setLlmConformityScore(llmScore);
 
-            // Other fields (unchanged)
-            analysis.setMetadata(metadata);
+            // 4) Mapper le reste des champs
+            analysis.setMetadata(savedMeta);
             analysis.setTotalRows(safeConvertToInteger(analysisResult.get("total_rows")));
             analysis.setMissingValues(safeConvertToInteger(analysisResult.get("missing_values")));
             analysis.setMissingPercentage(safeConvertToDouble(analysisResult.get("missing_percentage")));
-            analysis.setConformityScore(calculateConformityScore(
-                    analysis.getMissingPercentage(),
-                    safeConvertToBoolean(analysisResult.get("consentement_valide"))
-            ));
+            analysis.setConformityScore(
+                    calculateConformityScore(analysis.getMissingPercentage(),
+                            safeConvertToBoolean(analysisResult.get("consentement_valide")))
+            );
 
+            // 5) Sauvegarde de l'analyse
             analysisRepo.save(analysis);
-            logger.info("Saved analysis for: {}", metadata.getFileName());
+
 
         } catch (Exception e) {
-            logger.error("Persist error: {}", e.getMessage());
+            logger.error("Persist error: {}", e.getMessage(), e);
             throw new RuntimeException("Échec de la persistance: " + e.getMessage(), e);
-        }
-    }
-
-    // ✅ Added RGPD analysis check
-    private void validateAnalysisData(Map<String, Object> data) {
-        if (!data.containsKey("total_rows")) {
-            throw new IllegalArgumentException("Données manquantes: total_rows");
-        }
-        if (!data.containsKey("rgpd_analysis")) {
-            throw new IllegalArgumentException("Données manquantes: rgpd_analysis");
         }
     }
 
@@ -130,3 +127,4 @@ public class AnalysisService {
         return Math.max(0.0, Math.min(100.0, score));
     }
 }
+

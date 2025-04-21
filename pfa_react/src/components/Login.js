@@ -14,6 +14,7 @@ const Login = () => {
     e.preventDefault();
     AuthService.login(username, password)
       .then((data) => {
+        console.log("🔐 login response:", data);
         setMessage("Connexion réussie !");
         setRedirect(true);
         navigate(data.role === "ROLE_ADMIN" ? "/admin/dashboard" : "/welcome"); // Redirect to welcome for regular users

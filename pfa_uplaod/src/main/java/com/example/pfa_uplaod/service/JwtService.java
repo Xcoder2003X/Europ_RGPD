@@ -21,11 +21,15 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .claim("roles", userDetails.getAuthorities().stream()
+                        .map(auth -> auth.getAuthority())
+                        .toList()) // ajoute les rôles dans le token
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SECRET_KEY)
                 .compact();
     }
+
 
     public boolean validateToken(String token) {
         try {
