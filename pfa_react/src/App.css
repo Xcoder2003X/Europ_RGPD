@@ -1,17 +1,24 @@
-body {
+/*body {
   top: 0;
   left: 0;
   width: 100%;
   height: 200%;
-  background: linear-gradient(120deg, #1a2a6c 0%, #1f81b2 60%, #a6d2f8 85%);
-  background-size: cover;}
+  background: linear-gradient(120deg, #0f172a, #1e293b);
+  overflow: hidden;  backdrop-filter: blur(10px);
+    background-size: cover;}*/
+    body {
+      background-image: linear-gradient(-225deg, #180d40 0%, #44107A 29%, #FF1361 67%, #FFF800 100%);
+      top: 0;
+        left: 0;
+        width: 100%;
+        height: 200%;
+        background-size: cover;}
   .app{
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100vh;
     text-align: center;
-  
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -52,7 +59,7 @@ body {
 /* Apply the animation to the text */
 h1 {
   /*animation: slideInFromLeft 4s ease-out forwards;*/
-  font-size: 2rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
@@ -72,51 +79,100 @@ h1 {
 /* Navbar Class */
 .navbar {
   position: fixed;
-  right: 50px;
   top: 0;
   font-family: var(--font1);
   font-size: var(--main-size-font);
-  left: 50px;
-  width: 1480px;  /* Ensure it spans the entire width of the container */
+  width: 1410px;  /* Ensure it spans the entire width of the container */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
   z-index: 50; /* Pour être sûr que la navbar reste au-dessus */
 
 }
 
-.navbar h1 {
-  font-size: 18px;
-  font-weight: bold;
-  font-family: var(--font2);
-}
+
 
 .navbar .nav-links {
   display: flex;
-  gap: 6px;
+  gap: 15px;
+  filter: drop-shadow(2px 5px 5px #313131);
+
 }
 
 .navbar .nav-links a {
-  color: white;
+  color: rgb(251, 245, 245);
+  background-color: transparent; /* Darker Indigo on hover */
+  filter: drop-shadow(0 0 5px #313131);
 
 }
 
-.navbar .nav-links a:hover {
-  background-color: #4ccffb; /* Darker Indigo on hover */
-}
+
 
 
 .logo {
-  width: 200px;
-  height: 130px;
+  width: 180px;
+  height: 120px;
   background-image: url('./../public/nav_img.png'); /* adapte le chemin si nécessaire */
   background-size: cover;
   background-position: center;
-  
+  filter: drop-shadow(8px 8px 16px black);
   background-repeat: no-repeat;
   display: inline-block;
   margin: 0;
 }
 
 
+/* From Uiverse.io by gharsh11032000 */ 
+.animated-button {
+  filter: drop-shadow(2px 5px 5px #313131);
+  position: relative;
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: inherit;
+  border-radius: 100px;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 0 0 2px #ffffff20;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.animated-button span:last-child {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background-color: #2196F3;
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.animated-button span:first-child {
+  position: relative;
+  z-index: 1;
+}
+
+.animated-button:hover {
+  box-shadow: 0 0 0 5px #2195f360;
+  color: #ffffff;
+}
+
+.animated-button:active {
+  scale: 0.95;
+}
+
+.animated-button:hover span:last-child {
+  width: 150px;
+  height: 150px;
+  opacity: 1;
+}
+
+
+
+
+/* for waves */

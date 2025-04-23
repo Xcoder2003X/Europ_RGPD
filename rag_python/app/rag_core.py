@@ -1,3 +1,5 @@
+import logging
+logging.basicConfig(level=logging.DEBUG)
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 import faiss
@@ -6,7 +8,8 @@ import numpy as np
 
 class RAGSystem:
     def __init__(self):
-        # Charger le modèle CamemBERT
+        # Charger le modèle CamemBERT qui Turn user questions 
+        # (and documents) into vector embeddings (numeric form) so they can be compared efficiently
         self.embedder = HuggingFaceEmbeddings(
             model_name="dangvantuan/sentence-camembert-base"
         )
@@ -22,8 +25,9 @@ class RAGSystem:
         # Étape 1 : Extraction des données
         from data_pipeline import run_data_pipeline
         raw_texts = run_data_pipeline()
-        
-        # Étape 2 : Découpage en chunks optimisé pour l'analyse RGPD
+        logging.debug(raw_texts)
+
+        # Étape 2 : Découpage en chunks optimise pour l'analyse RGPD
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=800,  # Réduit pour plus de précision
             chunk_overlap=150,  # Ajusté pour maintenir le contexte
@@ -50,12 +54,17 @@ class RAGSystem:
             self.chunks.extend(chunks)
         
         # Étape 3 : Vectorisation avec dimensionnalité optimisée
+        # Converts the text chunks into embeddings
         embeddings = self.embedder.embed_documents(self.chunks)
         dimension = len(embeddings[0])
         self.index = faiss.IndexFlatL2(dimension)
+        #Adds these embeddings to a FAISS index
+        #FAISS permet de retrouver très vite "quel vecteur 
+        # ressemble le plus" à ta question.
         self.index.add(np.array(embeddings))
         
         # Sauvegarder l'index
+        #Saves the FAISS index to legal_index.faiss
         faiss.write_index(self.index, "vector_store/legal_index.faiss")
 
     def query(self, question, k=4):  # Augmenté à 4 pour plus de contexte
@@ -72,3 +81,6 @@ class RAGSystem:
             relevant_chunks.append(f"[Pertinence: {relevance:.2f}] {chunk}")
         
         return " ".join(relevant_chunks), relevant_chunks
+    
+
+        

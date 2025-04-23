@@ -3,19 +3,11 @@ import React, { useState } from "react";
 import axios from "axios";
 import {
   Button,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TableContainer,
-  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 import { toast } from "react-toastify";
 
 // 🎨 Styles pour le tableau
@@ -59,6 +51,9 @@ const FileUpload = () => {
   const [conformityDialogOpen, setConformityDialogOpen] = useState(false);
   const [conformityPoints, setConformityPoints] = useState([]);
   const [nonConformityPoints, setNonConformityPoints] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
   };
@@ -69,10 +64,13 @@ const FileUpload = () => {
       return;
     }
 
+
     const formData = new FormData();
     formData.append("file", file);
 
     try {
+      setLoading(true); // Show loader
+
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
@@ -99,6 +97,9 @@ const FileUpload = () => {
     } catch (error) {
       toast.error("❌ Erreur lors de l'analyse du fichier !");
     }
+    finally {
+      setLoading(false); // Hide loader whether success or error
+      }
   };
 
   // 🔹 Génération et téléchargement du rapport PDF
@@ -143,8 +144,8 @@ const FileUpload = () => {
     }
   };
 
-  const ConformityDialog = () => (
-    <Dialog
+  const ConformityDialog = () => (     
+      <Dialog
       open={conformityDialogOpen}
       onClose={() => setConformityDialogOpen(false)}
       maxWidth="md"
@@ -307,10 +308,20 @@ const FileUpload = () => {
         </Button>
       </DialogActions>
     </Dialog>
+    
   );
 
   return (
+   <div >
+{loading && <div class="container" >
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+</div>}
+
     <div className="file-upload-container">
+       
       <h2 className="upload-title">Upload de fichiers</h2>
 
       <div className="file-upload-content">
@@ -364,6 +375,7 @@ const FileUpload = () => {
         <div className="error-message">Error: {analysisData.error}</div>
       )}
     </div>
+   </div>
   );
 };
 

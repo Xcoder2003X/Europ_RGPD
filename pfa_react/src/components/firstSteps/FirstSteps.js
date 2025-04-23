@@ -63,6 +63,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: '40px 30px',
   borderRadius: '25px',
   background: 'rgba(255, 255, 255, 0.1)',
+
   backdropFilter: 'blur(20px)',
   border: '1px solid rgba(255, 255, 255, 0.2)',
   width: '720px',
@@ -101,7 +102,6 @@ const ParallaxBackground = styled('div')({
   left: 0,
   width: '100%',
   height: '200%',
-  background: 'linear-gradient(120deg, #1a2a6c 0%, #1f81b2 70%, #99c8f1 85%)',
   backgroundSize: 'cover',
   animation: 'moveBackground 30s linear infinite',
   zIndex: -1,

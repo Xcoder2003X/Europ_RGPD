@@ -68,7 +68,7 @@ const Dashboard = () => {
           value: `${(data?.avgMissingPercentage ?? 0).toFixed(2)}%`,
           color: "text-red-400"
         }].map((item, index) => (
-          <div key={index} className="bg-gray-900 p-4 shadow-md rounded-xl">
+          <div key={index} className="bg-transparent p-4 shadow-lg shadow-black/50 rounded-xl">
             <h2 className="text-lg font-semibold">{item.title}</h2>
             <p className={`text-3xl ${item.color}`}>{item.value}</p>
           </div>
@@ -77,7 +77,9 @@ const Dashboard = () => {
 
       {/* Graphiques */}
       <div className="grid grid-cols-2 gap-6 mt-6">
-        <div className="bg-gray-900 p-4 shadow-md rounded-xl">
+        <div className="bg-transparent p-4 shadow-lg shadow-black/50
+
+ rounded-xl">
           <h2 className="text-lg font-semibold">Scores de conformité</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data?.conformityScores ?? []}>
@@ -91,8 +93,8 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-gray-900 p-4 shadow-md rounded-xl">
-          <h2 className="text-lg font-semibold">Répartition des formats de fichiers</h2>
+        <div className="bg-transparent p-4 shadow-lg shadow-black/50 rounded-xl">
+          <h2 className="text-lg font-semibold">% de chaque type de fichier</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={data?.fileTypes ?? []} dataKey="count" nameKey="type" cx="50%" cy="50%" outerRadius={100} label>
@@ -107,12 +109,14 @@ const Dashboard = () => {
       </div>
 
       {/* Liste des fichiers récents */}
-      <div className="bg-gray-900 p-4 shadow-md rounded-xl mt-6">
+      <div className="bg-transparent p-4 
+
+ rounded-xl mt-6">
         <h2 className="text-lg font-semibold">Derniers fichiers analysés</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full mt-4 border border-gray-700">
+        <div className="overflow-x-auto shadow-lg shadow-black/50">
+          <table className="w-full mt-4 border border-gray-700 ">
             <thead>
-              <tr className="bg-gray-800">
+              <tr className="shadow-xl text-gray-400 shadow-black/30">
                 <th className="p-2 border border-gray-700">Fichier</th>
                 <th className="p-2 border border-gray-700">Organisation</th>
                 <th className="p-2 border border-gray-700">Conformité</th>
@@ -123,7 +127,7 @@ const Dashboard = () => {
                 <tr key={index} className="text-center">
                   <td className="p-2 border border-gray-700">{file.name}</td>
                   <td className="p-2 border border-gray-700">{file.droppedBy}</td>
-                  <td className={`p-2 border border-gray-700 ${file.score >= 70 ? "text-green-400" : "text-red-400"}`}>
+                  <td className={`p-2 border border-gray-700 ${file.score >= 70 ? "text-green-800" : "text-red-800"}`}>
                     {file.score.toFixed(1)}%
                   </td>
                 </tr>

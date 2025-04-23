@@ -89,7 +89,7 @@ public class DashboardController {
                                         // ✅ Use LLM score instead of calculated score
                                         map.put("score", analysis.getLlmConformityScore() != null
                                                 ? analysis.getLlmConformityScore().doubleValue() // Convertit Integer → Double
-                                                : 0.0);
+                                                : 0.000);
                                         return map;
                                 })
                                 .collect(Collectors.toList());
