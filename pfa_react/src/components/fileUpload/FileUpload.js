@@ -9,9 +9,25 @@ import {
   DialogActions,
 } from "@mui/material";
 import { toast } from "react-toastify";
-
+import Robot3D from "../Robot3D";
+import { keyframes } from '@emotion/react';
+import styled from '@emotion/styled';
 // 🎨 Styles pour le tableau
-
+const fadeIn = keyframes`
+    from { opacity: 0; }
+    to { opacity: 1; }
+  `;
+  
+  const AnimatedContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 4px 4px 10px 6px rgb(66, 66, 66);
+  border-radius: 30px;
+  padding: 30px;
+  animation: ${fadeIn} 2s ease-out;
+`;
 // Add this utility component at the top of your file
 const RenderValue = ({ value }) => {
   if (typeof value === "object" && value !== null) {
@@ -311,17 +327,22 @@ const FileUpload = () => {
     
   );
 
-  return (
-   <div >
-{loading && <div class="container" >
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-</div>}
 
-    <div className="file-upload-container">
-       
+    
+
+  return (
+   <div>
+{loading && 
+<div class="textWrapper">
+  <p class="text">Generating Analysis...</p>
+  <div class="invertbox"></div>
+</div>
+}
+<AnimatedContainer>
+
+<Robot3D robotImage="robot5.png" width={"100px"} height={"100px"}/>
+<div className="file-upload-container">
+
       <h2 className="upload-title">Upload de fichiers</h2>
 
       <div className="file-upload-content">
@@ -375,6 +396,7 @@ const FileUpload = () => {
         <div className="error-message">Error: {analysisData.error}</div>
       )}
     </div>
+</AnimatedContainer>
    </div>
   );
 };

@@ -11,7 +11,9 @@
     background-color: #1a1a1a;
     color: #fff;
     border: 1px solid #333;
-    filter: drop-shadow(8px 8px 10px  #3c62f7);
+    filter: drop-shadow(8px 8px 8px  #1c48f6);
+    animation: FormAppear 1s ease-out ;
+
   }
   
   .title {
@@ -131,5 +133,16 @@
     to {
       transform: scale(1.8);
       opacity: 0;
+    }
+  }
+
+  @keyframes FormAppear {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
     }
   }
