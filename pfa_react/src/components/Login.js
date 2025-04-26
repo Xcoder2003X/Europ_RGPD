@@ -27,8 +27,8 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const [redirect, setRedirect] = useState(false);
   const [isExcited, setIsExcited] = useState(false); // State to control robot excitement
-  const [robotImage, setRobotImage] = useState("/robot1.png"); // Initial robot image
-  const robotImages = ["/robot1.png", "/robot2.png", "/robot3.png"]; // Array of robot images
+  const [robotImage, setRobotImage] = useState("/robot1.webP"); // Initial robot image
+  const robotImages = ["/robot1.webP", "/robot2.webP", "/robot3.webP"]; // Array of robot images
   const [hasTyped, setHasTyped] = useState(false); // State to track if user has typed
   const navigate = useNavigate();
 

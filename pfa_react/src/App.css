@@ -6,13 +6,20 @@
   background: linear-gradient(120deg, #0f172a, #1e293b);
   overflow: hidden;  backdrop-filter: blur(10px);
     background-size: cover;}*/
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
     body {
       background-image: linear-gradient(-225deg, #180d40 0%, #44107A 29%, #FF1361 67%, #FFF800 100%);
-      top: 0;
-        left: 0;
+        
+        margin: 0;
+        padding: 0;
         width: 100%;
         height: 200%;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 400;
+        line-height: 1.6;
         background-size: cover;}
+
   .app{
     margin: 0;
     padding: 0;
@@ -23,7 +30,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: calc(10px + 2vmin);
     color: white;
 }
 
@@ -103,6 +109,7 @@ h1 {
   color: rgb(251, 245, 245);
   background-color: transparent; /* Darker Indigo on hover */
   filter: drop-shadow(0 0 5px #313131);
+  text-decoration: none;
 
 }
 
@@ -111,7 +118,7 @@ h1 {
 
 .logo {
   width: 180px;
-  height: 120px;
+  height: 100px;
   background-image: url('./../public/nav_img.png'); /* adapte le chemin si nécessaire */
   background-size: cover;
   background-position: center;

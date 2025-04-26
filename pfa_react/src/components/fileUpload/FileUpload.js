@@ -334,21 +334,21 @@ const FileUpload = () => {
    <div>
 {loading && 
 <div class="textWrapper">
-  <p class="text">Generating Analysis...</p>
+  <p class="text">Generating Analysis...🚀🚀</p>
   <div class="invertbox"></div>
 </div>
 }
 <AnimatedContainer>
 
-<Robot3D robotImage="robot5.png" width={"100px"} height={"100px"}/>
+<Robot3D robotImage="robot5.webP" width={"100px"} height={"100px"}/>
 <div className="file-upload-container">
 
-      <h2 className="upload-title">Upload de fichiers</h2>
+      <h2 className="upload-title">Upload files 📃📃</h2>
 
       <div className="file-upload-content">
         <input type="file" onChange={handleFileChange} />
         <button className="button-analyse" onClick={handleUpload}>
-          Analyser le fichier
+          Analyze the file 🧠🧠
         </button>
       </div>
 
@@ -356,7 +356,7 @@ const FileUpload = () => {
 
       <div>
         <button className="button-rapport" onClick={downloadReport}>
-          Générer le Rapport
+          Generate Report 📎📎
         </button>
       </div>
       <ConformityDialog />
@@ -371,22 +371,22 @@ const FileUpload = () => {
           }}
         >
           {analysisData.rgpd_analysis.consentement_valide
-            ? "✅ Consentement valide"
-            : "⛔ Consentement non valide"}
+            ? "✅ Valid consent"
+            : "⛔ Invalid consent"}
         </p>
       )}
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Rapport Généré</DialogTitle>
+        <DialogTitle>Generated Report</DialogTitle>
         <DialogContent>
-          <p>Le rapport a été généré avec succès.</p>
-          <p>Vous pouvez le télécharger ci-dessous :</p>
+          <p>The Report was generated successfully.</p>
+          <p>You can download it below :</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} color="secondary">
-            Fermer
+            Close
           </Button>
           <Button href={reportUrl} download="report.pdf" color="primary">
-            Télécharger
+            Download
           </Button>
         </DialogActions>
       </Dialog>

@@ -4,7 +4,7 @@
     flex-direction: column;
     gap: 10px;
     width: 400px;
-    margin-top: 60px;
+    margin-top: 40px;
     padding: 20px;
     border-radius: 20px;
     position: relative;
@@ -25,6 +25,8 @@
     align-items: center;
     padding-left: 30px;
     color: #00bfff;
+    margin-bottom: 10px; /* reduce space below title */
+
   }
   
   .title::before {
@@ -53,6 +55,7 @@
   .signin {
     font-size: 14.5px;
     color: rgba(255, 255, 255, 0.7);
+    margin-top: 10px;
   }
   
   .signin {
@@ -117,7 +120,7 @@
     color: #fff;
     font-size: 16px;
     transform: .3s ease;
-    background-color: #00bfff;
+    background-color: rgb(79, 107, 193);
   }
   
   .submit:hover {

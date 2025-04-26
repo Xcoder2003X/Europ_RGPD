@@ -17,7 +17,7 @@ function App() {
 
           <div className="nav-links">
 <Link class="animated-button" to="/">
-  <span>📝 registre</span>
+  <span>📝 registrer</span>
   <span></span>
 </Link>
 <Link class="animated-button" to="/login">
@@ -25,7 +25,7 @@ function App() {
   <span></span>
 </Link>
 <Link class="animated-button" to="/upload">
-  <span>⬇️ telecharger</span>
+  <span>⬇️ download</span>
   <span></span>
 </Link>
 

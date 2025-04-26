@@ -5,6 +5,23 @@ import AuthService from "../services/AuthService";
 import Robot3D from "./Robot3D";
 import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
+
+const fadeIn = keyframes`
+    from { opacity: 0; }
+    to { opacity: 1; }
+  `;
+
+  const AnimatedContainer = styled.div`
+    position: absolute;
+    top: 150px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    box-shadow: 4px 4px 10px 6px rgb(66, 66, 66);
+    border-radius: 30px;
+    padding: 30px;
+    animation: ${fadeIn} 2s ease-out;
+  `;
 const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -33,26 +50,11 @@ const SignUp = () => {
     }
   };
 
-  const fadeIn = keyframes`
-    from { opacity: 0; }
-    to { opacity: 1; }
-  `;
-
-  const AnimatedContainer = styled.div`
-    position: absolute;
-    top: 150px;
-    display: flex;
-    align-items: center;
-    gap: 40px;
-    box-shadow: 4px 4px 10px 6px rgb(66, 66, 66);
-    border-radius: 30px;
-    padding: 30px;
-    animation: ${fadeIn} 2s ease-out;
-  `;
+  
 
   return (
     <AnimatedContainer>
-      <Robot3D robotImage="robot.png" />
+      <Robot3D robotImage="robot.webP" />
       <form className="form" onSubmit={handleSubmit}>
         <p className="title">Register </p>
         <p className="message">Signup now and get full access to our app. </p>
