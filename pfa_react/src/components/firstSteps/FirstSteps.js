@@ -7,6 +7,8 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import WarningIcon from '@mui/icons-material/Warning';
 import DescriptionIcon from '@mui/icons-material/Description';
+import { useTranslation } from "react-i18next";
+import "./../../i18n"; // Ensure i18n is initialized
 
 const fadeInUp = keyframes`
   from {
@@ -113,6 +115,10 @@ const ParallaxBackground = styled('div')({
 });
 
 const FirstSteps = () => {
+
+  // Importing the useTranslation hook from react-i18next for internationalization
+  const { t } = useTranslation();
+  
   const navigate = useNavigate();
 
   const handleStart = () => {
@@ -120,10 +126,10 @@ const FirstSteps = () => {
   };
 
   const steps = [
-    { label: "Sélectionnez votre fichier", icon: <InsertDriveFileIcon sx={{ color: '#00c3ff' }} /> },
-    { label: "Analyse automatique de vos données", icon: <AutoGraphIcon sx={{ color: '#00c3ff' }} /> },
-    { label: "Détection des non-conformités RGPD", icon: <WarningIcon sx={{ color: '#00c3ff' }} /> },
-    { label: "Rapport détaillé avec recommandations", icon: <DescriptionIcon sx={{ color: '#00c3ff' }} /> }
+    { label: `${t('firstSteps.step1')}`, icon: <InsertDriveFileIcon sx={{ color: '#00c3ff' }} /> },
+    { label: `${t('firstSteps.step2')}`, icon: <AutoGraphIcon sx={{ color: '#00c3ff' }} /> },
+    { label: `${t('firstSteps.step3')}`, icon: <WarningIcon sx={{ color: '#00c3ff' }} /> },
+    { label: `${t('firstSteps.step4')}`, icon: <DescriptionIcon sx={{ color: '#00c3ff' }} /> }
   ];
 
   return (
@@ -144,10 +150,10 @@ const FirstSteps = () => {
       <StyledPaper elevation={5}>
         <Box sx={{ textAlign: 'center', mb: 3 }}>
           <Typography variant="h3" component="h1" sx={{ color: '#ffffff', fontWeight: '800', fontSize: '2.5rem', mb: 1 }}>
-            Analyse RGPD Automatisée
+            {t('firstSteps.title')}
           </Typography>
           <Typography variant="h6" sx={{ color: '#d0d0d0', fontSize: '1.1rem' }}>
-            Commencez en quelques étapes simples
+          {t('firstSteps.title1')}
           </Typography>
         </Box>
 
@@ -168,7 +174,7 @@ const FirstSteps = () => {
           onClick={handleStart}
           startIcon={<AssessmentIcon sx={{ color: 'white' }} />}
         >
-          Démarrer l'Analyse
+          {t('firstSteps.getStartedButton')}
         </StyledButton>
       </StyledPaper>
     </Box>

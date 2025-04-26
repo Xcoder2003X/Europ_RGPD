@@ -5,6 +5,8 @@ import AuthService from "../services/AuthService";
 import Robot3D from "./Robot3D";
 import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
+import { useTranslation } from "react-i18next";
+import "../i18n"; // Ensure i18n is initialized
 
 const fadeIn = keyframes`
     from { opacity: 0; }
@@ -23,6 +25,8 @@ const fadeIn = keyframes`
     animation: ${fadeIn} 2s ease-out;
   `;
 const SignUp = () => {
+  const { t } = useTranslation();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("ROLE_USER"); // Default to "ROLE_USER"
@@ -56,8 +60,8 @@ const SignUp = () => {
     <AnimatedContainer>
       <Robot3D robotImage="robot.webP" />
       <form className="form" onSubmit={handleSubmit}>
-        <p className="title">Register </p>
-        <p className="message">Signup now and get full access to our app. </p>
+        <p className="title">{t("register")}</p>
+        <p className="message">{t("signupMessage")}</p>
 
         <label>
           <input
@@ -67,7 +71,7 @@ const SignUp = () => {
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-          <span>Username</span>
+          <span>{t("username")}</span>
         </label>
 
         <label>
@@ -78,22 +82,22 @@ const SignUp = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <span>Password</span>
+          <span>{t("password")}</span>
         </label>
         <div style={{ display: "flex", gap: "20px", margin: "10px" }}>
-          <label>Role:</label>
+          <label>{t("role")}:</label>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
             disabled={!isAdmin} // Disable the admin role selection for non-admin users
           >
-            <option value="ROLE_USER">User</option>
-            {isAdmin && <option value="ROLE_ADMIN">Admin</option>}
+            <option value="ROLE_USER">{t("user")}</option>
+            {isAdmin && <option value="ROLE_ADMIN">{t("admin")}</option>}
           </select>
         </div>
-        <button className="submit">Submit</button>
+        <button className="submit">{t("submit")}</button>
         <p className="signin">
-          Already have an acount ? <a href="login">Login</a>{" "}
+          {t("alreadyHaveAccount")} <a href="login">{t("login")}</a>
         </p>
       </form>
     </AnimatedContainer>

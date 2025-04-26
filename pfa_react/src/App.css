@@ -98,17 +98,17 @@ h1 {
 
 
 
-.navbar .nav-links {
+ .nav-links {
   display: flex;
-  gap: 15px;
+  gap: 20px;
   filter: drop-shadow(2px 5px 5px #313131);
 
 }
 
 .navbar .nav-links a {
+  height: fit-content;
   color: rgb(251, 245, 245);
   background-color: transparent; /* Darker Indigo on hover */
-  filter: drop-shadow(0 0 5px #313131);
   text-decoration: none;
 
 }
@@ -182,4 +182,24 @@ h1 {
 
 
 
-/* for waves */
+/* langageSwitcher spot*/
+.language-switcher-container {
+  position: relative;
+  display: inline-block;
+  filter: drop-shadow(2px 5px 5px #313131);
+
+}
+
+.language-switcher-container::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  clip-path: inset(5% 20% 15% 10%);
+  transform: translate(-50%, -50%);
+  width: 140px; /* Adjust size as needed */
+  height: 120px; /* Adjust size as needed */
+  background: transparent; /* Purple gradient */
+  z-index: -1; /* Place it behind the content */
+  filter: blur(20px); /* Add a blur effect for a glowing look */
+}

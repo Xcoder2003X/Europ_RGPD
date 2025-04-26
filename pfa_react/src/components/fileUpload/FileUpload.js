@@ -12,6 +12,8 @@ import { toast } from "react-toastify";
 import Robot3D from "../Robot3D";
 import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
+import { useTranslation } from "react-i18next";
+import "./../../i18n"; // Ensure i18n is initialized
 // 🎨 Styles pour le tableau
 const fadeIn = keyframes`
     from { opacity: 0; }
@@ -28,6 +30,8 @@ const fadeIn = keyframes`
   padding: 30px;
   animation: ${fadeIn} 2s ease-out;
 `;
+
+
 // Add this utility component at the top of your file
 const RenderValue = ({ value }) => {
   if (typeof value === "object" && value !== null) {
@@ -62,6 +66,10 @@ const FileUpload = () => {
   const [message, setMessage] = useState("");
   const [reportUrl, setReportUrl] = useState("");
   const [open, setOpen] = useState(false);
+
+  // for translation purpose
+  const { t } = useTranslation();
+
   // Add new state variables
 
   const [conformityDialogOpen, setConformityDialogOpen] = useState(false);
@@ -343,12 +351,12 @@ const FileUpload = () => {
 <Robot3D robotImage="robot5.webP" width={"100px"} height={"100px"}/>
 <div className="file-upload-container">
 
-      <h2 className="upload-title">Upload files 📃📃</h2>
+      <h2 className="upload-title">{t("fileUpload.title")}📃📃</h2>
 
       <div className="file-upload-content">
         <input type="file" onChange={handleFileChange} />
         <button className="button-analyse" onClick={handleUpload}>
-          Analyze the file 🧠🧠
+          {t("fileUpload.analyzeButton")} 
         </button>
       </div>
 
@@ -356,7 +364,7 @@ const FileUpload = () => {
 
       <div>
         <button className="button-rapport" onClick={downloadReport}>
-          Generate Report 📎📎
+          {t("fileUpload.generateReportButton")} 
         </button>
       </div>
       <ConformityDialog />
@@ -371,22 +379,22 @@ const FileUpload = () => {
           }}
         >
           {analysisData.rgpd_analysis.consentement_valide
-            ? "✅ Valid consent"
-            : "⛔ Invalid consent"}
+            ? ` ${t("fileUpload.validConsent")}`
+            : ` ${t("fileUpload.invalidConsent")}`}
         </p>
       )}
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Generated Report</DialogTitle>
+        <DialogTitle>{t("fileUpload.generatedReportTitle")}</DialogTitle>
         <DialogContent>
-          <p>The Report was generated successfully.</p>
-          <p>You can download it below :</p>
+          <p>{t("fileUpload.reportSuccessMessage")}</p>
+          <p>{t("fileUpload.downloadPrompt")}</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} color="secondary">
-            Close
+          {t("fileUpload.closeButton")}
           </Button>
           <Button href={reportUrl} download="report.pdf" color="primary">
-            Download
+          {t("fileUpload.downloadButton")}
           </Button>
         </DialogActions>
       </Dialog>

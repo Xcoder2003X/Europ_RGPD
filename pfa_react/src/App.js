@@ -5,6 +5,7 @@ import Login from './components/Login';
 import FileUpload from './components/fileUpload/FileUpload';
 import FirstSteps from './components/firstSteps/FirstSteps';
 import Dashboard from './components/Dashb/Dashboard';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import './App.css';
 
 function App() {
@@ -13,23 +14,20 @@ function App() {
       <div className="app">
         {/* Custom Styled Navbar */}
         <nav className="navbar">
-        <h1 class="logo"></h1>
+          <h1 className="logo"></h1>
 
           <div className="nav-links">
-<Link class="animated-button" to="/">
-  <span>📝 registrer</span>
-  <span></span>
-</Link>
-<Link class="animated-button" to="/login">
-  <span>🔑 connect</span>
-  <span></span>
-</Link>
-<Link class="animated-button" to="/upload">
-  <span>⬇️ download</span>
-  <span></span>
-</Link>
-
-          
+            <Link className="animated-button" to="/">
+              <span>📝 registrer</span>
+              <span></span>
+            </Link>
+            <Link className="animated-button" to="/login">
+              <span>🔑 connect</span>
+              <span></span>
+            </Link>
+            <div  className="language-switcher-container absolute top-[5px] right-0">
+              <LanguageSwitcher/> {/* Language Switcher Component */}
+            </div>
           </div>
         </nav>
         <Routes>

@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import Robot3D from "./Robot3D";
 import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
+import { useTranslation } from "react-i18next";
+import "../i18n"; // Ensure i18n is initialized
+
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
@@ -22,6 +25,8 @@ const fadeIn = keyframes`
     animation: ${fadeIn} 2s ease-out;
   `;
 const Login = () => {
+  const { t } = useTranslation();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -82,8 +87,8 @@ const Login = () => {
         <p>{message}</p>
       </div>
       <form className="form" onSubmit={handleSubmit}>
-        <p className="title">Login </p>
-        <p className="message">Login now and get full access to our app. </p>
+        <p className="title">{t("login")}</p>
+        <p className="message">{t("signupMessage")}</p>
 
         <label>
           <input
@@ -93,7 +98,7 @@ const Login = () => {
             onChange={handleInputChange(setUsername)}
             required
           />
-          <span>Username</span>
+          <span>{t("username")}</span>
         </label>
 
         <label>
@@ -104,12 +109,12 @@ const Login = () => {
             onChange={handleInputChange(setPassword)}
             required
           />
-          <span>Password</span>
+          <span>{t("password")}</span>
         </label>
 
-        <button className="submit">Submit</button>
+        <button className="submit">{t("submit")}</button>
         <p className="signin">
-          <a href="/">Register</a>{" "}
+          <a href="/">{t("alreadyHaveAccount")}</a>
         </p>
       </form>
     </AnimatedContainer>
