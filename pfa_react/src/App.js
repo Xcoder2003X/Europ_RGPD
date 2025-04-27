@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import FileUpload from './components/fileUpload/FileUpload';
@@ -8,11 +8,13 @@ import Dashboard from './components/Dashb/Dashboard';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import './App.css';
 
-function App() {
+function AppContent() {
+  const location = useLocation(); // Use the hook here
+
   return (
-    <Router>
-      <div className="app">
-        {/* Custom Styled Navbar */}
+    <div className="app">
+      {/* Conditionally render navbar */}
+      {!location.pathname.startsWith('/admin/dashboard') && (
         <nav className="navbar">
           <h1 className="logo"></h1>
 
@@ -25,25 +27,27 @@ function App() {
               <span>🔑 connect</span>
               <span></span>
             </Link>
-            <div  className="language-switcher-container absolute top-[5px] right-0">
-              <LanguageSwitcher/> {/* Language Switcher Component */}
+            <div className="language-switcher-container absolute top-[5px] right-0">
+              <LanguageSwitcher /> {/* Language Switcher Component */}
             </div>
           </div>
         </nav>
-        <Routes>
-          <Route path="/" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/welcome" element={<FirstSteps />} />
-          <Route path="/upload" element={<FileUpload />} />
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-        </Routes>
-      </div>
-
-      {/* Page Routes */}
-    </Router>
+      )}
+      <Routes>
+        <Route path="/" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/welcome" element={<FirstSteps />} />
+        <Route path="/upload" element={<FileUpload />} />
+        <Route path="/admin/dashboard" element={<Dashboard />} />
+      </Routes>
+    </div>
   );
 }
 
-export default App;
-
-
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}

@@ -4,7 +4,7 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, Tooltip, 
   XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer
 } from "recharts";
-
+import "./dashboard.css"; // Import your CSS file for styling
 const COLORS = ["#82ca9d", "#8884d8", "#ff7300", "#ffbb28", "#ff6384"];
 
 const Dashboard = () => {
@@ -50,7 +50,8 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 w-full  pt-[150px] min-h-screen text-white ">
+    <div className="dashboard-container">
+  <div className="p-6 w-full  pt-[150px] min-h-screen text-white ">
       <h1 className="text-2xl font-bold mb-6">📊 Dashboard de conformité</h1>
 
       {/* Cartes des indicateurs clés */}
@@ -68,7 +69,7 @@ const Dashboard = () => {
           value: `${(data?.avgMissingPercentage ?? 0).toFixed(2)}%`,
           color: "text-red-400"
         }].map((item, index) => (
-          <div key={index} className="bg-transparent p-4 shadow-lg shadow-black/50 rounded-xl">
+          <div key={index} className="bg-transparent p-4 shadow-lg shadow-white/75 rounded-xl">
             <h2 className="text-lg font-semibold">{item.title}</h2>
             <p className={`text-3xl ${item.color}`}>{item.value}</p>
           </div>
@@ -77,7 +78,7 @@ const Dashboard = () => {
 
       {/* Graphiques */}
       <div className="grid grid-cols-2 gap-6 mt-6">
-        <div className="bg-transparent p-4 shadow-lg shadow-black/50
+        <div className="bg-transparent p-4 shadow-lg shadow-white/75
 
  rounded-xl">
           <h2 className="text-lg font-semibold">Scores de conformité</h2>
@@ -93,7 +94,7 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-transparent p-4 shadow-lg shadow-black/50 rounded-xl">
+        <div className="bg-transparent p-4 shadow-lg shadow-white/75 rounded-xl">
           <h2 className="text-lg font-semibold">% de chaque type de fichier</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -113,7 +114,7 @@ const Dashboard = () => {
 
  rounded-xl mt-6">
         <h2 className="text-lg font-semibold">Derniers fichiers analysés</h2>
-        <div className="overflow-x-auto shadow-lg shadow-black/50">
+        <div className="overflow-x-auto shadow-lg shadow-white/75">
           <table className="w-full mt-4 border border-gray-700 ">
             <thead>
               <tr className="shadow-xl text-gray-400 shadow-black/30">
@@ -150,6 +151,9 @@ const Dashboard = () => {
         ))}
       </div>
     </div>
+    </div>
+
+  
   );
 };
 
