@@ -75,6 +75,8 @@ public class DashboardController {
                                                         "count", entry.getOrDefault("count", 0L)))
                                         .collect(Collectors.toList());
                         dashboardData.put("fileTypes", fileTypes);
+                        dashboardData.put("totalRows", totalCells);  // Or rename to totalCells
+                        dashboardData.put("totalMissing", totalMissing);
 
                         // Scores de conformité paginés
                         List<Map<String, Object>> conformityScores = analysisPage.getContent()

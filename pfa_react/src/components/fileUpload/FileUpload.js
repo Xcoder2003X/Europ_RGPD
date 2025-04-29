@@ -22,10 +22,11 @@ const fadeIn = keyframes`
   
   const AnimatedContainer = styled.div`
   display: flex;
+  margin-top: 60px;
   justify-content: center;
   align-items: center;
   gap: 20px;
-  box-shadow: 4px 4px 10px 6px rgb(66, 66, 66);
+  box-shadow: 3px 3px 7px 6px black;
   border-radius: 30px;
   padding: 30px;
   animation: ${fadeIn} 2s ease-out;

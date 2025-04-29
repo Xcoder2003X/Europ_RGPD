@@ -135,7 +135,7 @@ public class OpenAIService {
         String prompt = "Analyse la conformité RGPD de ce texte et réponds avec :\n" +
                 "[SCORE:] (nombre entre 0-100)\n" +
                 "[CONSENTEMENT:] (OUI/NON)\n" +
-                "[RAISONS:] (liste concise des raisons, en indiquant 'non' pour les points non conformes et 'oui' pour les points conformes )\n\n" +
+                "[RAISONS:] (liste concise des raisons, en indiquant 'non' pour les points non conformes a RGPD et 'oui' pour les points conformes )\n\n" +
                 "Contexte RGPD : \n" + ragContext + "\n\n" +
                 "Texte à analyser :\n" + text;
 

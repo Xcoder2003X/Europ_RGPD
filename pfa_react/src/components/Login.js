@@ -14,12 +14,13 @@ const fadeIn = keyframes`
 `;
 
   const AnimatedContainer = styled.div`
-    position: absolute;
-    top: 150px;
+    position: relative;
+    top: 60px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 40px;
-    box-shadow: 4px 4px 10px 6px rgb(66, 66, 66);
+    box-shadow: 4px 4px 10px 6px black;
     border-radius: 30px;
     padding: 30px;
     animation: ${fadeIn} 2s ease-out;

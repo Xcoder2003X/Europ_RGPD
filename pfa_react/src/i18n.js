@@ -8,6 +8,8 @@ const resources = {
     translation: {
       login: "Login",
       username: "Username",
+      nav_btn1: "Get Started",
+      nav_btn2: "Secure Login",
       password: "Password",
       register: "Register",
       signupMessage: "Signup now and get full access to our app.",
@@ -48,6 +50,9 @@ const resources = {
       username: "Nom d'utilisateur",
       password: "Mot de passe",
       register: "S'inscrire",
+      nav_btn1: "Commencer",
+      nav_btn2: "Connexion sécurisée",
+
       signupMessage: "Inscrivez-vous maintenant et accédez à toutes les fonctionnalités de notre application.",
       role: "Rôle",
       user: "Utilisateur",
@@ -86,6 +91,9 @@ const resources = {
       username: "اسم المستخدم",
       password: "كلمة المرور",
       register: "تسجيل",
+      nav_btn1: "ابدأ الآن",
+      nav_btn2: "تسجيل دخول آمن",
+
       signupMessage: "سجل الآن واحصل على وصول كامل إلى تطبيقنا.",
       role: "الدور",
       user: "مستخدم",

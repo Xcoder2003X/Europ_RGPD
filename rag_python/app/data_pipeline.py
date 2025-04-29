@@ -1,68 +1,79 @@
-from bs4 import BeautifulSoup
-import requests
-from PyPDF2 import PdfReader
-import re
+import logging
+from langchain_community.document_loaders import UnstructuredURLLoader, PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-class DataExtractor:
-    @staticmethod
-    def extract_from_url(url):
-        try:
-            response = requests.get(url)
-            # BeautifulSoup parse HTML and removes unnecessary elements like footer, nav, script, 
-            # style, and header
-            soup = BeautifulSoup(response.text, 'html.parser')
-            # Nettoyage spécifique aux sites juridiques
-            #Supprime les éléments HTML inutiles fréquents dans les sites juridiques :
-            for element in soup(['footer', 'nav', 'script', 'style', 'header']):
-                element.decompose()
-            #Capture uniquement les balises utiles pour le contenu juridique :
-            text = ' '.join([p.get_text() for p in soup.find_all(['p', 'article'])])
-            return re.sub(r'\s+', ' ', text).strip()
-        except Exception as e:
-            print(f"Erreur sur {url} : {str(e)}")
-            return ""
+logging.basicConfig(level=logging.INFO)
 
-    @staticmethod
-    def extract_from_pdf(pdf_url):
-        try:
-            #Telechargement du fichier PDF depuis 
-            # l'URL en utilisant une requête HTTP GET (requests.get).
-            response = requests.get(pdf_url)
-            #Ouverture (ou creation) d'un fichier nomme temp
-            #.pdf en mode binaire écriture (wb)
-            with open("temp.pdf", "wb") as f:
-                f.write(response.content)
-            reader = PdfReader("temp.pdf")
-            # Pour chaque page du PDF, on extrait le texte, puis 
-            # on concatene toutes les pages
-            text = ''.join([page.extract_text() for page in reader.pages])
-            return re.sub(r'\s+', ' ', text).strip()
-        except Exception as e:
-            print(f"Erreur PDF sur {pdf_url} : {str(e)}")
-            return ""
-
-# Liste de vos URLs
 URLS = [
     "https://www.dpo-partage.fr/exemple-rapport-annuel-du-dpo/",
     "https://www.cnil.fr/fr/cybersecurite/les-violations-de-donnees-personnelles",
     "https://www.cnil.fr/sites/cnil/files/2024-03/cnil_guide_securite_personnelle_2024.pdf",
-    "https://www.mission-rgpd.com/?utm_source",
+    "https://www.mission-rgpd.com/",
     "https://reports.alpiq.com/20/fr/conformite-socio-economique/",
-    "https://lecoursgratuit.com/rapport-rgpd-modele-excel-automatise/?utm_source",
-    "https://www.witik.io/lp/modele-rapport-annuel-dpo/?utm_source"
-    # Ajoutez toutes vos URLs ici
+    "https://lecoursgratuit.com/rapport-rgpd-modele-excel-automatise/",
+    "https://www.witik.io/lp/modele-rapport-annuel-dpo/",
+    "https://www.dpo-partage.fr/exemple-rapport-annuel-du-dpo/?utm_source=chatgpt.com"
+
 ]
 
-#Both methods clean up the extracted text 
-# by removing extra whitespace and normalizing it, 
-# which is essential for downstream processing.
-def run_data_pipeline():
-    all_texts = []
-    for url in URLS:
-        if url.endswith('.pdf'):
-            text = DataExtractor.extract_from_pdf(url)
-        else:
-            text = DataExtractor.extract_from_url(url)
-        if text:
-            all_texts.append(text)
-    return all_texts
+# Classe principale pour le pipeline de traitement des données.
+class DataPipeline:
+    def __init__(self, urls=None):
+        self.urls = urls or URLS
+        self.loaders = []  # will now hold (loader, url) pairs
+
+
+    #Crée les loaders appropriés selon le type de document (PDF ou HTML).
+    def build_loaders(self):
+        self.loaders = []
+        for url in self.urls:
+            if url.lower().endswith('.pdf'):
+                loader = PyPDFLoader(url)
+            else:
+                loader = UnstructuredURLLoader([url])
+            # store the mapping here
+            self.loaders.append((loader, url))
+
+
+    #Charge les documents et ajoute les métadonnées de source. Gestion d'erreurs robuste.
+    def load_documents(self):
+        all_docs = []
+        self.build_loaders()
+        for loader, source_url in self.loaders:
+            try:
+                docs = loader.load()
+                for doc in docs:
+                    # now this is always safe:
+                    doc.metadata['source'] = source_url
+                all_docs.extend(docs)
+            except Exception as e:
+                logging.warning(f"Failed to load {source_url!r}: {e}")
+        return all_docs
+
+
+    #Découpe les documents en chunks avec chevauchement et structure sémantique préservée.
+    @staticmethod
+    def split_documents(docs, chunk_size=800, chunk_overlap=150):
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            separators=["\nArticle", "\n§", "\n•", "\n\n", "\n"]
+        )
+        chunks = []
+        for doc in docs:
+            pieces = splitter.split_text(doc.page_content)
+            for i, text in enumerate(pieces):
+                chunks.append({
+                    'text': text,
+                    'metadata': {
+                        'source': doc.metadata.get('source'),
+                        'chunk_index': i
+                    }
+                })
+        return chunks
+
+    def run(self):
+        docs = self.load_documents()
+        return self.split_documents(docs)
+
+

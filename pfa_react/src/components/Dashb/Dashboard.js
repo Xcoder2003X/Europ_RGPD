@@ -4,7 +4,6 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, Tooltip, 
   XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer
 } from "recharts";
-import "./dashboard.css"; // Import your CSS file for styling
 const COLORS = ["#82ca9d", "#8884d8", "#ff7300", "#ffbb28", "#ff6384"];
 
 const Dashboard = () => {
@@ -21,6 +20,7 @@ const Dashboard = () => {
   const handlePageChange = (newPage) => {
     setPage(newPage);
     fetchData(newPage);
+    console.log(newPage + "was clicked");
   };
 
   const fetchData = async (pageNumber = page) => {
@@ -50,8 +50,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="dashboard-container">
-  <div className="p-6 w-full  pt-[150px] min-h-screen text-white ">
+  <div className="p-6 w-full  pt-[50px] min-h-screen text-white ">
       <h1 className="text-2xl font-bold mb-6">📊 Dashboard de conformité</h1>
 
       {/* Cartes des indicateurs clés */}
@@ -139,18 +138,18 @@ const Dashboard = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center mt-4 ">
         {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i}
             onClick={() => handlePageChange(i)}
-            className={`mx-1 px-3 py-1 rounded ${i === page ? 'bg-blue-500' : 'bg-gray-700'}`}
+      
+            className={`mx-1 px-3 py-1 z-40 rounded ${i === page ? 'bg-blue-500' : 'bg-gray-700'}`}
           >
             {i + 1}
           </button>
         ))}
       </div>
-    </div>
     </div>
 
   
