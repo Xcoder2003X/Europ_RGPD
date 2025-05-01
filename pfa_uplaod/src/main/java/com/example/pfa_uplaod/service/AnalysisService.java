@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Map;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -27,59 +28,48 @@ public class AnalysisService {
 
     @Autowired
     public AnalysisService(FileMetadataRepository metadataRepo,
-                           FileAnalysisRepository analysisRepo,
-                           UserRepository userRepository) {
+            FileAnalysisRepository analysisRepo,
+            UserRepository userRepository) {
         this.metadataRepo = metadataRepo;
         this.analysisRepo = analysisRepo;
         this.userRepository = userRepository;
     }
 
-    public void saveAnalysisResults(FileMetaData metadata, Map<String, Object> analysisResult) {
-        FileAnalysis analysis = new FileAnalysis();
-
+    public void saveAnalysisResults(FileMetaData metadata, Map<String, Object> analysisResult, FileAnalysis fileAnalysis) {
         try {
+            // 1. Save metadata first
+            metadata = metadataRepo.save(metadata);
 
+            // 2. Set metadata reference in file analysis
+            fileAnalysis.setMetadata(metadata);
 
-            // 2) Lier et persister le metadata
+            // 3. Convert and set values from analysisResult
+            fileAnalysis.setTotalRows(safeConvertToInteger(analysisResult.get("total_rows")));
+            fileAnalysis.setMissingValues(safeConvertToInteger(analysisResult.get("missing_values")));
+            fileAnalysis.setMissingPercentage(safeConvertToDouble(analysisResult.get("missing_percentage")));
 
-            Integer columns = safeConvertToInteger(analysisResult.get("columns"));
-            metadata.setColumns(columns != null ? columns : 0);
-            FileMetaData savedMeta = metadataRepo.save(metadata);
-
-            // 3) Extraction du score LLM
+            // 4. Handle RGPD analysis
             Map<String, Object> rgpdAnalysis = (Map<String, Object>) analysisResult.get("rgpd_analysis");
-            Integer llmScore = 0;
             if (rgpdAnalysis != null) {
-                Object scoreObj = rgpdAnalysis.get("score_conformite");
-                if (scoreObj instanceof Number) {
-                    llmScore = ((Number) scoreObj).intValue();
-                } else if (scoreObj != null) {
-                    try {
-                        llmScore = Integer.parseInt(scoreObj.toString());
-                    } catch (NumberFormatException e) {
-                        logger.warn("Invalid score format: {}", scoreObj);
-                    }
-                }
+                fileAnalysis.setLlmConformityScore(safeConvertToInteger(rgpdAnalysis.get("score_conformite")));
+                fileAnalysis.setHasConsent(safeConvertToBoolean(rgpdAnalysis.get("consentement_valide")));
             }
-            analysis.setLlmConformityScore(llmScore);
 
-            // 4) Mapper le reste des champs
-            analysis.setMetadata(savedMeta);
-            analysis.setTotalRows(safeConvertToInteger(analysisResult.get("total_rows")));
-            analysis.setMissingValues(safeConvertToInteger(analysisResult.get("missing_values")));
-            analysis.setMissingPercentage(safeConvertToDouble(analysisResult.get("missing_percentage")));
-            analysis.setConformityScore(
-                    calculateConformityScore(analysis.getMissingPercentage(),
-                            safeConvertToBoolean(analysisResult.get("consentement_valide")))
-            );
+            // 5. Calculate final score
+            fileAnalysis.setConformityScore(calculateConformityScore(
+                    fileAnalysis.getMissingPercentage(),
+                    fileAnalysis.getHasConsent()
+            ));
 
-            // 5) Sauvegarde de l'analyse
-            analysisRepo.save(analysis);
+            // 6. Set analysis date
+            fileAnalysis.setAnalysisDate(LocalDateTime.now());
 
+            // 7. Save the analysis
+            analysisRepo.save(fileAnalysis);
 
         } catch (Exception e) {
             logger.error("Persist error: {}", e.getMessage(), e);
-            throw new RuntimeException("Échec de la persistance: " + e.getMessage(), e);
+            throw new RuntimeException("Persistence failed: " + e.getMessage(), e);
         }
     }
 
@@ -127,4 +117,3 @@ public class AnalysisService {
         return Math.max(0.0, Math.min(100.0, score));
     }
 }
-

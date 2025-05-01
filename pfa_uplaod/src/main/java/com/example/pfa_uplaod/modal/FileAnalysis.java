@@ -121,6 +121,14 @@ return conformityScore;    }
         this.llmConformityScore = llmConformityScore != null ? llmConformityScore : 0;
     }
 
+    public Object getAnalysisDate() {
+        return analysisDate;
+    }
+
+    public void setAnalysisDate(LocalDateTime now) {
+       this.analysisDate = now;
+    }
+
 
 
     // ... autres getters/setters

@@ -38,9 +38,9 @@ public class FileUploadController {
 
     @Autowired
     public FileUploadController(FileAnalysisService fileAnalysisService,
-                                ReportService reportService,
-                                AnalysisService analysisService,
-                                OpenAIService openAIService) {
+            ReportService reportService,
+            AnalysisService analysisService,
+            OpenAIService openAIService) {
         this.fileAnalysisService = fileAnalysisService;
         this.reportService = reportService;
         this.analysisService = analysisService;
@@ -72,10 +72,13 @@ public class FileUploadController {
     public ResponseEntity<?> uploadFile(@RequestPart("file") MultipartFile file) {
         try {
             if (file.isEmpty()) {
+                logger.warn("No file selected for upload");
                 return ResponseEntity.badRequest().body(Map.of("error", "Aucun fichier sélectionné !"));
             }
 
+            logger.info("Starting file upload for: {}", file.getOriginalFilename());
             Map<String, Object> analysisResult = fileAnalysisService.analyzeFile(file);
+            logger.info("File analysis result: {}", analysisResult);
 
             FileMetaData metadata = new FileMetaData();
             metadata.setFileName(file.getOriginalFilename());
@@ -83,8 +86,9 @@ public class FileUploadController {
             metadata.setFileSize(file.getSize());
             metadata.setUploadDate(LocalDateTime.now());
 
-            analysisService.saveAnalysisResults(metadata, analysisResult);
+            logger.info("Metadata before saving: {}", metadata);
 
+            logger.info("File upload and analysis completed successfully for: {}", file.getOriginalFilename());
             return ResponseEntity.ok(analysisResult);
         } catch (Exception e) {
             logger.error("Error uploading file: {}", e.getMessage(), e);

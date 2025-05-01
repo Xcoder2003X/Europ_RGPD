@@ -1,5 +1,6 @@
 package com.example.pfa_uplaod.controller;
 
+import com.example.pfa_uplaod.modal.FileAnalysis;
 import com.example.pfa_uplaod.modal.FileMetaData;
 import com.example.pfa_uplaod.modal.UserEntity;
 import com.example.pfa_uplaod.repository.UserRepository;
@@ -85,8 +86,10 @@ public class ReportController {
             metadata.setUploadDate(LocalDateTime.now());
             metadata.setUploadedBy(user);
             metadata.setOrganisation_name(username);
-            analysisService.saveAnalysisResults(metadata, analysisResult);
 
+// Create and pass a new FileAnalysis object
+            FileAnalysis fileAnalysis = new FileAnalysis();
+            analysisService.saveAnalysisResults(metadata, analysisResult, fileAnalysis); // Add FileAnalysis parameter
             // 6. Return response (no authResponse needed)
             return ResponseEntity.ok(analysisResult);
 
