@@ -6,7 +6,6 @@
   background: linear-gradient(120deg, #0f172a, #1e293b);
   overflow: hidden;  backdrop-filter: blur(10px);
     background-size: cover;}*/
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
     body {
       background-image: linear-gradient(-225deg, black 0%, #44107A 40%, #FF1361 67%, #eeff00 100%);
@@ -14,8 +13,8 @@
         padding: 0;
         width: 100%;
         height: 200%;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 400;
+        font-family: 'Roboto Mono', monospace;
+        font-weight: 600;
         line-height: 1.6;
         background-size: cover;}
 
@@ -325,4 +324,21 @@ h1 {
   background: transparent; /* Purple gradient */
   z-index: -1; /* Place it behind the content */
   filter: blur(20px); /* Add a blur effect for a glowing look */
+}
+
+/* Ajouter ces règles */
+@container dashboardContainer (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-item {
+    min-height: 300px;
+  }
+}
+
+/* Modifier le conteneur principal */
+.dashboard-container {
+  container-type: inline-size;
+  container-name: dashboardContainer;
 }

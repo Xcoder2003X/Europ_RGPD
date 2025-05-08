@@ -159,12 +159,12 @@
 /* the loader style*/
 /* From Uiverse.io by Uncannypotato69 */ 
 .textWrapper {
-  height: 90px;
+  height: 70px;
   width: fit-content;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 700;
   letter-spacing: 0.25ch;
   position: absolute;

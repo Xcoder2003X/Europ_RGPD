@@ -1,0 +1,34 @@
+# application.yml
+openai:
+  api:
+    key: ${OPENAI_API_KEY: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} # Valeur par défaut pour le développement
+    url: https://openrouter.ai/api/v1/chat/completions
+
+rag:
+  service:
+    url: ${RAG_SERVICE_URL:http://localhost:5000/query}
+
+
+
+resilience4j:
+  # Configuration du Circuit Breaker (existante)
+  circuitbreaker:
+    instances:
+      ragService:
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 10s
+        sliding-window-type: TIME_BASED
+        sliding-window-size: 10
+      openaiService:
+        failure-rate-threshold: 40
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 30s
+
+  # Ajoutez cette section (Nouveau)
+  timelimiter:
+    instances:
+      ragService:
+        timeout-duration: 40s  # Timeout spécifique pour RAG
+      openaiService:
+        timeout-duration: 70s  # Timeout plus long pour OpenAI

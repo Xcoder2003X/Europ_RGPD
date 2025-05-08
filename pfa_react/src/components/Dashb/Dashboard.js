@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { 
-  BarChart, Bar, PieChart, Pie, Cell, Tooltip, 
+ Bar,  Pie, Cell, Tooltip, 
   XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer
 } from "recharts";
+import { lazy, Suspense } from 'react';
+import { LoadingSpinner } from "../LoadingSpinner";
+import { ErrorMessage } from "../ErrorMessage";
+
+
 const COLORS = ["#82ca9d", "#8884d8", "#ff7300", "#ffbb28", "#ff6384"];
 
 const Dashboard = () => {
@@ -42,12 +47,31 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return <div className="text-white text-center mt-10">Chargement des données...</div>;
+    return <LoadingSpinner message="Chargement des données..." />;
   }
 
   if (error) {
-    return <div className="text-red-500 text-center mt-10">{error}</div>;
+    return <ErrorMessage error={error} />;
   }
+
+// Extraction de named exports via .then()
+const LazyBarChart = lazy(() =>
+  import('recharts').then(module => ({ default: module.BarChart }))
+);
+const LazyPieChart = lazy(() =>
+  import('recharts').then(module => ({ default: module.PieChart }))
+);
+
+// Créer un composant mémoïsé
+const MemoizedFileRow = React.memo(({ file }) => (
+  <tr className="text-center">
+    <td className="p-2 border border-gray-700">{file.name}</td>
+    <td className="p-2 border border-gray-700">{file.droppedBy}</td>
+    <td className={`p-2 border border-gray-700 ${file.score >= 70 ? "text-green-800" : "text-red-800"}`}>
+      {file.score.toFixed(1)}%
+    </td>
+  </tr>
+));
 
   return (
   <div className="p-6 w-full  pt-[50px] min-h-screen text-white ">
@@ -76,36 +100,41 @@ const Dashboard = () => {
       </div>
 
       {/* Graphiques */}
-      <div className="grid grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-2 gap-6 mt-[70px] mb-[70px]">
+      <Suspense fallback={<div className="text-white">Chargement des graphiques...</div>}>
+
         <div className="bg-transparent p-4 shadow-lg shadow-white/75
 
  rounded-xl">
           <h2 className="text-lg font-semibold">Scores de conformité</h2>
+
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data?.conformityScores ?? []}>
+            <LazyBarChart data={data?.conformityScores ?? []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#ffffff55" />
               <XAxis dataKey="name" stroke="#fff" />
               <YAxis stroke="#fff" />
               <Tooltip contentStyle={{ backgroundColor: "#333", color: "#fff" }} />
               <Legend wrapperStyle={{ color: "#fff" }} />
               <Bar dataKey="score" fill="#82ca9d" />
-            </BarChart>
+            </LazyBarChart>
           </ResponsiveContainer>
         </div>
 
         <div className="bg-transparent p-4 shadow-lg shadow-white/75 rounded-xl">
           <h2 className="text-lg font-semibold">% de chaque type de fichier</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
+            <LazyPieChart>
               <Pie data={data?.fileTypes ?? []} dataKey="count" nameKey="type" cx="50%" cy="50%" outerRadius={100} label>
                 {data?.fileTypes?.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip contentStyle={{ backgroundColor: "#333", color: "#fff" }} />
-            </PieChart>
+            </LazyPieChart>
           </ResponsiveContainer>
         </div>
+
+        </Suspense>
       </div>
 
       {/* Liste des fichiers récents */}
@@ -124,14 +153,8 @@ const Dashboard = () => {
             </thead>
             <tbody>
               {data?.conformityScores?.map((file, index) => (
-                <tr key={index} className="text-center">
-                  <td className="p-2 border border-gray-700">{file.name}</td>
-                  <td className="p-2 border border-gray-700">{file.droppedBy}</td>
-                  <td className={`p-2 border border-gray-700 ${file.score >= 70 ? "text-green-800" : "text-red-800"}`}>
-                    {file.score.toFixed(1)}%
-                  </td>
-                </tr>
-              ))}
+              <MemoizedFileRow key={`${file.name}-${index}`} file={file} />
+))}
             </tbody>
           </table>
         </div>

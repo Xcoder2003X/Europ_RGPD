@@ -340,6 +340,7 @@ const FileUpload = () => {
     
 
   return (
+    
    <div>
 {loading && 
 <div class="textWrapper">
