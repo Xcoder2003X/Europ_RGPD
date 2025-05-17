@@ -6,7 +6,7 @@ openai:
 
 rag:
   service:
-    url: ${RAG_SERVICE_URL:http://localhost:5000/query}
+    url: ${RAG_SERVICE_URL:http://rag-service:5000/query}
 
 
 

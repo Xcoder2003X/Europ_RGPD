@@ -28,10 +28,14 @@ public class UserEntity {
     @Column(nullable = false)
     private String role;  // "USER" ou "ADMIN"
 
+
+
     public UserEntity(String username, String password, String role) {
         this.username = username;
         this.password = password;
         this.role = role;
     }
+
+
 }
 

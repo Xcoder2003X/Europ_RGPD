@@ -86,11 +86,8 @@ public class DashboardController {
                                         map.put("name", getFileName(analysis));
                                         map.put("droppedBy", analysis.getMetadata().getOrganisation_name());
 
-
-
-                                        // ✅ Use LLM score instead of calculated score
-                                        map.put("score", analysis.getLlmConformityScore() != null
-                                                ? analysis.getLlmConformityScore().doubleValue() // Convertit Integer → Double
+                                       map.put("score", analysis.getLlmConformityScore() != null
+                                                ? analysis.getLlmConformityScore().doubleValue()
                                                 : 0.000);
                                         return map;
                                 })

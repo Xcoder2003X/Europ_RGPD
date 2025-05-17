@@ -31,7 +31,7 @@ const Dashboard = () => {
   const fetchData = async (pageNumber = page) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/reports/dashboard?page=${pageNumber}&size=8`, {
+      const response = await axios.get(`http://localhost/api/reports/dashboard?page=${pageNumber}&size=8`,{
         headers: {
           'Authorization': `Bearer ${token}`
         }

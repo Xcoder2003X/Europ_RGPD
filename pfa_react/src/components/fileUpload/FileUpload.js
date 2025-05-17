@@ -99,7 +99,7 @@ const FileUpload = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        "http://localhost:8080/api/reports/analyze",
+        "http://localhost/api/reports/analyze",
 
         formData,
         {
@@ -139,7 +139,7 @@ const FileUpload = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/files/generate-report",
+        "http://localhost/api/files/generate-report",
         formData,
         {
           responseType: "blob",

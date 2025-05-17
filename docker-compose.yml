@@ -1,43 +1,69 @@
 version: '3.8'
 
 services:
-  spring-backend:
-    build: ./pfa_uplaod
+  mmysql:
+    image: mysql:latest
+    restart: always
     ports:
-      - "8080:8080"
+      - "3309:3306"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      MYSQL_DATABASE: pfa_db
+      MYSQL_USER: ayoub
+      MYSQL_PASSWORD: ayoub
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_VALIDATE_PASSWORD: "OFF"
+    volumes:
+      - ./db/:/var/lib/mysql
     networks:
       - ai-conform-net
-
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+  spring-backend:
+    build: ./pfa_uplaod
+    restart: always
+    expose:
+      - "8080"
+    environment:
+      MYSQL_HOST: mmysql
+      MYSQL_USER: ayoub
+      MYSQL_PASSWORD: ayoub
+      MYSQL_PORT: 3306
+    networks:
+      - ai-conform-net
+    depends_on:
+      mmysql:
+        condition: service_healthy
   react-frontend:
     build: ./pfa_react
     ports:
-      - "3000:80"
-    depends_on:
-      - spring-backend
+      - "80:80"
     networks:
-      - ai-conform-net
+      - ai-conform-net    
+    depends_on:
+      mmysql:
+        condition: service_healthy
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
 
   rag-service:
     build: ./rag_python
     ports:
       - "5000:5000"
-    environment:
-      - PORT=5000
     volumes:
       - ./rag_python/data:/app/data
     networks:
       - ai-conform-net
-    # For GPU support:
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+    depends_on:
+      mmysql:
+        condition: service_healthy
 
 networks:
   ai-conform-net:
     driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

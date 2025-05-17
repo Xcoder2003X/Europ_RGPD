@@ -1,3 +1,17 @@
+# Database
+/db/
+*.dblwr
+*.ibd
+*.pem
+binlog.*
+*.cnf
+ibdata1
+ibtmp1
+undo_*
+mysql/
+performance_schema/
+sys/
+
 # Java
 *.class
 *.jar
@@ -9,6 +23,8 @@
 build/
 target/
 out/
+.springBeans
+.sts4-cache
 
 # React
 node_modules/
@@ -32,7 +48,34 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+/rag_python/data/
+/rag_python/vector_store/
+/rag_python/document_cache/
+.env
+.venv
+env/
+venv/
+ENV/
+*.pyc
+
 # Project specific
 reports/
 *.pdf
-*.log 
+*.log
+
+# Sensitive data
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
