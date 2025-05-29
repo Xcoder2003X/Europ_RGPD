@@ -21,8 +21,9 @@ public class FileMetaData {
     private String fileType;
     private Long fileSize;
     private LocalDateTime uploadDate;
+    private String modelName; // Added field for AI model name
 
-   private String organisation_name;
+    private String organisation_name;
 
     @Column(nullable = false) // <-- Colonne non-nullable
     private Integer columns = 0; // Valeur par défaut

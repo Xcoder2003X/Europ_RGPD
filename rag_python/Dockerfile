@@ -4,7 +4,8 @@ RUN pip install --upgrade pip && pip install waitress
 
 # Définit le répertoire de travail
 WORKDIR /app
-
+COPY wait-for-mysql.sh /app/wait-for-mysql.sh
+RUN chmod +x /app/wait-for-mysql.sh
 # Installe les dépendances système nécessaires
 RUN apt-get update && apt-get install -y \
     libmagic1 \
@@ -13,14 +14,14 @@ RUN apt-get update && apt-get install -y \
     libtesseract-dev \
     build-essential \
     python3-dev \
+    default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Copie les fichiers nécessaires
 COPY requirements.txt .
 
 # Installe les dépendances Python
-RUN pip install --no-cache-dir -r requirements.txt
-
+RUN pip install --no-cache-dir --retries 10 --timeout 1000 -r requirements.txt
 # Copie le reste de l'application en préservant la structure des dossiers
 COPY app/ ./app/
 COPY data_pipeline/ ./data_pipeline/

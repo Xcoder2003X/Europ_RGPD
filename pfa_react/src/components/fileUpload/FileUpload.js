@@ -14,6 +14,8 @@ import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useTranslation } from "react-i18next";
 import "./../../i18n"; // Ensure i18n is initialized
+import API_CONFIG from '../../config/api.config';
+
 // 🎨 Styles pour le tableau
 const fadeIn = keyframes`
     from { opacity: 0; }
@@ -89,22 +91,19 @@ const FileUpload = () => {
       return;
     }
 
-
     const formData = new FormData();
     formData.append("file", file);
+    const modelName = localStorage.getItem("aiModelName");
+    formData.append("modelName", modelName); // Add modelName to form data
 
     try {
-      setLoading(true); // Show loader
-
-      const token = localStorage.getItem("token");
-
+      setLoading(true);
+      const token = localStorage.getItem("token");      
       const response = await axios.post(
-        "http://localhost/api/reports/analyze",
-
+        `${API_CONFIG.BASE_URL}${API_CONFIG.REPORTS.ANALYZE}`,
         formData,
         {
           headers: {
-            // on laisse axios générer le bon Content‑Type avec boundary
             Authorization: `Bearer ${token}`,
           },
         }
@@ -121,10 +120,9 @@ const FileUpload = () => {
       setAnalysisData(response.data);
     } catch (error) {
       toast.error("❌ Erreur lors de l'analyse du fichier !");
+    } finally {
+      setLoading(false);
     }
-    finally {
-      setLoading(false); // Hide loader whether success or error
-      }
   };
 
   // 🔹 Génération et téléchargement du rapport PDF
@@ -139,7 +137,7 @@ const FileUpload = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost/api/files/generate-report",
+        `${API_CONFIG.BASE_URL}${API_CONFIG.FILE.GENERATE_REPORT}`,
         formData,
         {
           responseType: "blob",

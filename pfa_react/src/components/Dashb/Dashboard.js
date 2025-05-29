@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import API_CONFIG from '../../config/api.config';
 import { 
  Bar,  Pie, Cell, Tooltip, 
   XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer
@@ -31,11 +32,14 @@ const Dashboard = () => {
   const fetchData = async (pageNumber = page) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost/api/reports/dashboard?page=${pageNumber}&size=8`,{
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const response = await axios.get(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.REPORTS.DASHBOARD}?page=${pageNumber}&size=8`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         }
-      });
+      );
       setData(response.data);
       setTotalPages(response.data.totalPages);
     } catch (err) {

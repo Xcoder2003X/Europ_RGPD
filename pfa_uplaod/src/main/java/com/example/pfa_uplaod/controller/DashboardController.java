@@ -78,16 +78,18 @@ public class DashboardController {
                         dashboardData.put("totalRows", totalCells);  // Or rename to totalCells
                         dashboardData.put("totalMissing", totalMissing);
 
-                        // Scores de conformité paginés
-                        List<Map<String, Object>> conformityScores = analysisPage.getContent()
+                        // Scores de conformité paginés                        List<Map<String, Object>> conformityScores = analysisPage.getContent()
                                 .stream()
                                 .map(analysis -> {
                                         Map<String, Object> map = new HashMap<>();
                                         map.put("name", getFileName(analysis));
-                                        map.put("droppedBy", analysis.getMetadata().getOrganisation_name());
+                                        map.put("droppedBy", analysis.getMetadata().getModelName());
 
-                                       map.put("score", analysis.getLlmConformityScore() != null
-                                                ? analysis.getLlmConformityScore().doubleValue()
+
+
+                                        // ✅ Use LLM score instead of calculated score
+                                        map.put("score", analysis.getLlmConformityScore() != null
+                                                ? analysis.getLlmConformityScore().doubleValue() // Convertit Integer → Double
                                                 : 0.000);
                                         return map;
                                 })

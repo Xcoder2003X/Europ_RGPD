@@ -55,6 +55,7 @@ public class ReportController {
     @PostMapping("/analyze")
     public ResponseEntity<?> analyzeFile(
             @RequestPart("file") MultipartFile file,
+            @RequestPart(value = "modelName", required = false) String modelName,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         try {
@@ -65,7 +66,7 @@ public class ReportController {
 
 
             // 2. Validate file
-            logger.info("Starting file analysis for: {}", file.getOriginalFilename());
+            logger.info("Starting file analysis for: {} with model: {}", file.getOriginalFilename(), modelName);
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Aucun fichier sélectionné !"));
             }
@@ -78,7 +79,7 @@ public class ReportController {
             Map<String, Object> conformityResult = openAIService.checkConformity(fileText);
             analysisResult.put("rgpd_analysis", conformityResult);
 
-            // 5. Save metadata
+            // 5. Save metadata with model name
             FileMetaData metadata = new FileMetaData();
             metadata.setFileName(file.getOriginalFilename());
             metadata.setFileType(determineFileType(file));
@@ -86,11 +87,13 @@ public class ReportController {
             metadata.setUploadDate(LocalDateTime.now());
             metadata.setUploadedBy(user);
             metadata.setOrganisation_name(username);
+            metadata.setModelName(modelName); // Set the model name
 
-// Create and pass a new FileAnalysis object
+            // Create and save analysis
             FileAnalysis fileAnalysis = new FileAnalysis();
-            analysisService.saveAnalysisResults(metadata, analysisResult, fileAnalysis); // Add FileAnalysis parameter
-            // 6. Return response (no authResponse needed)
+            analysisService.saveAnalysisResults(metadata, analysisResult, fileAnalysis);
+
+            // 6. Return response
             return ResponseEntity.ok(analysisResult);
 
         } catch (Exception e) {

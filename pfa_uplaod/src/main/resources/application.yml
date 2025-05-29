@@ -1,7 +1,7 @@
 # application.yml
 openai:
   api:
-    key: ${OPENAI_API_KEY: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} # Valeur par défaut pour le développement
+    key: ${OPENAI_API_KEY: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} # Valeur par défaut pour le développement
     url: https://openrouter.ai/api/v1/chat/completions
 
 rag:

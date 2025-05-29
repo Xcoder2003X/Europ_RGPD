@@ -1,14 +1,12 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost/api/auth/';
+import API_CONFIG from '../config/api.config';
 
 const register = (username, password, role) => {
-  return axios.post(API_URL + 'signup', { username, password, role });
+  return axios.post(API_CONFIG.AUTH.SIGNUP, { username, password, role });
 };
 
 const login = async (username, password) => {
-  // call the Spring /signin endpoint
-  const response = await axios.post(API_URL + 'signin', { username, password });
+  const response = await axios.post(API_CONFIG.AUTH.SIGNIN, { username, password });
 
   // if we got a token back, stash it
   if (response.data.token) {

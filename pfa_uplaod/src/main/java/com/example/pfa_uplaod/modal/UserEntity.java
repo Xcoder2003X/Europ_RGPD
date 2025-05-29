@@ -28,6 +28,12 @@ public class UserEntity {
     @Column(nullable = false)
     private String role;  // "USER" ou "ADMIN"
 
+    @Column(name = "model_name")
+    private String modelName;
+
+    @Column(name = "sector")
+    private String sector;
+
 
 
     public UserEntity(String username, String password, String role) {
