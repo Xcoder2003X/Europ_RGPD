@@ -68,8 +68,9 @@ const LazyPieChart = lazy(() =>
 
 // Créer un composant mémoïsé
 const MemoizedFileRow = React.memo(({ file }) => (
-  <tr className="text-center">
+  <tr className="text-center">    
     <td className="p-2 border border-gray-700">{file.name}</td>
+    <td className="p-2 border border-gray-700">{file.modelName}</td>
     <td className="p-2 border border-gray-700">{file.droppedBy}</td>
     <td className={`p-2 border border-gray-700 ${file.score >= 70 ? "text-green-800" : "text-red-800"}`}>
       {file.score.toFixed(1)}%
@@ -149,9 +150,9 @@ const MemoizedFileRow = React.memo(({ file }) => (
         <div className="overflow-x-auto shadow-lg shadow-white/75">
           <table className="w-full mt-4 border border-gray-700 ">
             <thead>
-              <tr className="shadow-xl text-gray-400 shadow-black/30">
-                <th className="p-2 border border-gray-700">Fichier</th>
-                <th className="p-2 border border-gray-700">Organisation</th>
+              <tr className="shadow-xl text-gray-400 shadow-black/30">                <th className="p-2 border border-gray-700">Fichier</th>
+                <th className="p-2 border border-gray-700">Modèle IA</th>
+                <th className="p-2 border border-gray-700">Déposé par</th>
                 <th className="p-2 border border-gray-700">Conformité</th>
               </tr>
             </thead>

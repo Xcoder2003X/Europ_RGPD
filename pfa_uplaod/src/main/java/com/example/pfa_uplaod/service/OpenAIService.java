@@ -2,6 +2,7 @@ package com.example.pfa_uplaod.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
@@ -15,15 +16,18 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
-public class OpenAIService {
+public class OpenAIService {    private static final Logger logger = LoggerFactory.getLogger(OpenAIService.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(OpenAIService.class);
+    @Value("${openai.api.url}")
+    private String OPENAI_API_URL;
 
-    private static final String OPENAI_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    // Note: Securely externalize your API key in production
-    private static final String OPENAI_API_KEY = "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";
-    private static final String RAG_SERVICE_URL = "http://localhost:5000/query";    // Add constants for headers    
-    private static final String FRONTEND_URL = "http://localhost:3000";
+    @Value("${openai.api.key}")
+    private String OPENAI_API_KEY;
+
+    @Value("${rag.service.url}")
+    private String RAG_SERVICE_URL;
+
+    private static final String FRONTEND_URL = "http://localhost";
     private static final String APP_USER_AGENT = "RGPD-Analyzer/1.0.0";
 
     private final RestTemplate restTemplate;
@@ -76,11 +80,12 @@ public class OpenAIService {
                 "Si non, citer les points de non-conformité et donner des recommandations pour la conformité totale.\n"
                 +
                 "Contexte RGPD pertinent : \n" + ragContext + "\n\n" +
-                "Voici le texte à analyser : \n" + text;        logger.info("Sending request to OpenAI API with prompt: {}", prompt);        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", "deepseek/deepseek-r1-zero:free");
-        requestBody.put("messages", List.of(Map.of("role", "user", "content", prompt)));
-        requestBody.put("temperature", 0.7);
-        requestBody.put("max_tokens", 2000);
+                "Voici le texte à analyser : \n" + text;        
+                logger.info("Sending request to OpenAI API with prompt: {}", prompt);        Map<String, Object> requestBody = new HashMap<>();
+                requestBody.put("model", "deepseek/deepseek-r1-zero:free");
+                requestBody.put("messages", List.of(Map.of("role", "user", "content", prompt)));
+                requestBody.put("temperature", 0.7);
+                requestBody.put("max_tokens", 2000);
         
         HttpHeaders headers = createOpenRouterHeaders();
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
@@ -238,10 +243,13 @@ public class OpenAIService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + OPENAI_API_KEY);
-        // Required headers for OpenRouter API
-        headers.set("HTTP-Referer", FRONTEND_URL);
-        headers.set("X-Title", "RGPD Analysis Tool");
-        headers.set(HttpHeaders.USER_AGENT, APP_USER_AGENT);
+        
+        // Required OpenRouter headers
+        headers.set("HTTP-Referer", FRONTEND_URL); // The URL of your site
+        headers.set("X-Title", "RGPD Analysis Tool"); // The name of your app
+        headers.set("User-Agent", APP_USER_AGENT);
+        
         return headers;
     }
+   
 }

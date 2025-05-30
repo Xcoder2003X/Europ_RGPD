@@ -19,28 +19,36 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 10s
-      retries: 5
+      start_period: 45s
+      retries: 15
 
   spring-backend:
     build: ./pfa_uplaod
     command: ["./wait-for-mysql.sh", "java", "-jar", "app.jar"]
     restart: always
     expose:
-      - "8080"
+      - "8080"    
     environment:
       MYSQL_HOST: mmysql
       MYSQL_USER: ayoub
       MYSQL_PASSWORD: ayoub
       MYSQL_PORT: 3306
+      RAG_SERVICE_URL: http://rag-service:5000
     networks:
       - ai-conform-net
+    volumes:
+      - ./mysql-config.cnf:/etc/mysql/conf.d/custom.cnf  # Add config
+      - mysql_data:/var/lib/mysql  # Use named volume instead of ./db
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 10s
       timeout: 5s
+      start_period: 50s
       retries: 3
     depends_on:
       mmysql:
+        condition: service_healthy
+      rag-service:
         condition: service_healthy
 
 
@@ -89,7 +97,7 @@ services:
       interval: 10s
       timeout: 30s
       retries: 5
-      start_period: 120s
+      start_period: 50s
     depends_on:
       mmysql:
         condition: service_healthy

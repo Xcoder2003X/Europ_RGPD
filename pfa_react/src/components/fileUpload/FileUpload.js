@@ -91,6 +91,9 @@ const FileUpload = () => {
       return;
     }
 
+    /**FormData is a browser API that lets you create a set of key/value pairs representing form fields and 
+     * their values. It's especially useful for sending files and data to the server */
+
     const formData = new FormData();
     formData.append("file", file);
     const modelName = localStorage.getItem("aiModelName");
